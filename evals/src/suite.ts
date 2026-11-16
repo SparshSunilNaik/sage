@@ -150,7 +150,7 @@ export const TASKS: EvalTask[] = [
             path: "src/todo.ts",
             oldString: "  list(): Todo[] {",
             newString:
-              "  rename(id: number, title: string): void {\n    const t = this.items.find((i) => i.id === id);\n    if (!t) throw new Error(`unknown todo ${id}`);\n    t.title = title;\n  }\n\n  list(): Todo[] {",
+              "  rename(id: number, title: string): void {\n    const t = this.items.find((i) => i.id === id);\n    if (!t) throw new Error('unknown todo ' + id);\n    t.title = title;\n  }\n\n  list(): Todo[] {",
           },
         },
       ],
