@@ -4,7 +4,7 @@
 
 - **Mode:** fake (deterministic fake engine; scripted agent solutions; zero LLM calls)
 - **Model:** fake/scripted-1 (deterministic, no LLM)
-- **Date:** 2026-11-16T16:12:50.196Z · **Commit:** `ff30c21` · **Platform:** win32-x64 · **Bun:** 1.4.4
+- **Date:** 2026-11-16T16:21:53.855Z · **Commit:** `fe71fc4` · **Platform:** win32-x64 · **Bun:** 1.4.4
 
 **How to read fake-mode numbers.** The agent's solutions are scripted, so the resolved rate measures SAGE's pipeline (planning → isolated execution → policy → verification → merge → hidden acceptance tests), not model capability. The chaos, red-team, impossible-task and budget suites measure SAGE's own mechanisms and are meaningful in fake mode. Model-dependent metrics (resolved rate on real tasks, cost per resolved task, cheating rate of a real model) require live mode.
 
@@ -15,12 +15,12 @@ throwaway checkout of the final run branch after the run; agents never see them.
 
 | Task | Repo | Final state | Hidden tests | Attempts | Tokens | Cost | Wall (s) | Denied calls | Human interventions | Traceable |
 |---|---|---|---|---|---|---|---|---|---|---|
-| calc-multiply | calc | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 1 | 7600 | $0.0408 | 1.4 | 0 | 1 | 100% |
+| calc-multiply | calc | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 1 | 7600 | $0.0408 | 1.3 | 0 | 1 | 100% |
 | calc-divide | calc | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 1 | 6100 | $0.0327 | 1.2 | 0 | 1 | 100% |
 | calc-stats | calc | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 2 | 9100 | $0.0489 | 2.1 | 0 | 1 | 100% |
-| strings-capitalize | strings | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 1 | 6100 | $0.0327 | 1.2 | 0 | 1 | 100% |
+| strings-capitalize | strings | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 1 | 6100 | $0.0327 | 1.3 | 0 | 1 | 100% |
 | strings-slugify | strings | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 1 | 6100 | $0.0327 | 1.2 | 0 | 1 | 100% |
-| todo-complete | todo | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 1 | 6100 | $0.0327 | 1.2 | 0 | 1 | 100% |
+| todo-complete | todo | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 1 | 6100 | $0.0327 | 1.3 | 0 | 1 | 100% |
 | todo-rename | todo | AWAITING_MERGE_APPROVAL | PASS (1 pass, 0 fail) | 1 | 6100 | $0.0327 | 1.3 | 0 | 1 | 100% |
 
 - **Resolved (hidden tests pass):** 7/7 (100%)
@@ -36,12 +36,12 @@ continues from the journal.
 
 | Crash point | Crashed | Resumed to completion | Steps re-executed | Extra agent invocations | Resume wall (s) |
 |---|---|---|---|---|---|
-| after-plan | yes | yes | 0 | 0 | 2.0 |
+| after-plan | yes | yes | 0 | 0 | 1.9 |
 | after-workspace | yes | yes | 0 | 0 | 1.6 |
 | mid-agent | yes | yes | 1 | 1 | 1.8 |
 | after-agent | yes | yes | 0 | 0 | 1.3 |
-| after-verify | yes | yes | 0 | 0 | 1.2 |
-| after-merge | yes | yes | 0 | 0 | 1.1 |
+| after-verify | yes | yes | 0 | 0 | 1.3 |
+| after-merge | yes | yes | 0 | 0 | 1.0 |
 | before-merge-approval | yes | yes | 0 | 0 | 0.2 |
 
 - **Resume success:** 7/7 (100%)

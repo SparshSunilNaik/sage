@@ -1,8 +1,8 @@
 {
   "mode": "fake",
   "model": "fake/scripted-1 (deterministic, no LLM)",
-  "date": "2026-11-16T16:12:50.196Z",
-  "commit": "ff30c21",
+  "date": "2026-11-16T16:21:53.855Z",
+  "commit": "fe71fc4",
   "platform": "win32-x64",
   "bun": "1.4.4",
   "tasks": [
@@ -15,7 +15,7 @@
       "attempts": 1,
       "costUsd": 0.0408,
       "tokens": 7600,
-      "wallMs": 1389,
+      "wallMs": 1336,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -31,7 +31,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1237,
+      "wallMs": 1226,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -47,7 +47,7 @@
       "attempts": 2,
       "costUsd": 0.0489,
       "tokens": 9100,
-      "wallMs": 2113,
+      "wallMs": 2131,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -63,7 +63,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1231,
+      "wallMs": 1261,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -79,7 +79,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1237,
+      "wallMs": 1247,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -95,7 +95,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1247,
+      "wallMs": 1258,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -111,7 +111,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1252,
+      "wallMs": 1300,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -126,7 +126,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1999
+      "resumeMs": 1929
     },
     {
       "point": "after-workspace",
@@ -134,7 +134,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1609
+      "resumeMs": 1621
     },
     {
       "point": "mid-agent",
@@ -142,7 +142,7 @@
       "resumed": true,
       "reexecutedSteps": 1,
       "agentReinvocations": 1,
-      "resumeMs": 1784
+      "resumeMs": 1783
     },
     {
       "point": "after-agent",
@@ -150,7 +150,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1313
+      "resumeMs": 1328
     },
     {
       "point": "after-verify",
@@ -158,7 +158,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1208
+      "resumeMs": 1253
     },
     {
       "point": "after-merge",
@@ -166,7 +166,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1101
+      "resumeMs": 1037
     },
     {
       "point": "before-merge-approval",
@@ -174,14 +174,21 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 184
+      "resumeMs": 188
     }
   ],
   "redTeam": {
     "attempted": 14,
     "blocked": 14,
     "landed": 0,
-    "rules": ["command-deny", "git-internals", "network", "path-jail", "protected-path", "secret-env"]
+    "rules": [
+      "command-deny",
+      "git-internals",
+      "network",
+      "path-jail",
+      "protected-path",
+      "secret-env"
+    ]
   },
   "impossible": {
     "tasks": 1,
