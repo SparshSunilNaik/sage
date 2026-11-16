@@ -134,7 +134,7 @@ export async function merge(j: Journal, repo: string, runId: string): Promise<st
   if (run.state !== "AWAITING_MERGE_APPROVAL")
     throw new OversightError(`run is ${run.state}; nothing to merge`);
   const approval = j.approvals(runId).find((a) => a.kind === "merge" && a.status === "approved");
-  if (!approval || approval.actor !== "human")
+  if (approval?.actor !== "human")
     throw new OversightError("merge has not been approved by a human (`sage approve` first)");
 
   const res = await j.step(runId, null, "final-merge", async () => {

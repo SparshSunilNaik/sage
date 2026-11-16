@@ -59,7 +59,15 @@ for (const file of files) {
   const relevant = lint.diagnostics.filter((d) => d.severity === "error" || d.severity === "warning");
   if (relevant.length) {
     problems += relevant.length;
-    console.log(biome.printDiagnostics(relevant, { filePath: rel, fileSource: content }));
+    const text = biome.printDiagnostics(relevant, { filePath: rel, fileSource: content });
+    console.log(
+      text
+        .replace(/<[^>]+>/g, "")
+        .replace(/&gt;/g, ">")
+        .replace(/&lt;/g, "<")
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, "&"),
+    );
   }
 }
 biome.shutdown();
