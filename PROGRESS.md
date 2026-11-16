@@ -19,7 +19,7 @@ _Last updated: 2026-11-16 (session 2: verification and website)._
 | 8 | Merge and oversight: run branch in dependency order; target branch untouched until approve and merge; trailers; machine identity; agent cannot approve | done | `oversight.ts`; e2e and CLI tests |
 | 9 | Traceability: `sage trace` tree; every change attributable to a task | done | `packages/trace`; e2e attribution assertion |
 | 10 | CLI: init, run, plan, status, approve, reject, resume, abort, trace, diff, merge, doctor, gc, eval; Zod-validated JSONC config | done | `packages/cli`; CLI tests |
-| 11 | Tests: state machines, policy, e2e, crash/resume, red team, impossible task; green on Windows | done | 106 tests, 0 failures (session 2). CI is green on windows-latest and ubuntu-latest |
+| 11 | Tests: state machines, policy, e2e, crash/resume, red team, impossible task; green on Windows | done | 124 tests, 0 failures (end of session 2). CI is green on windows-latest and ubuntu-latest |
 | 12 | Eval scaffold: 7 tasks in 3 fixture repos with hidden tests, plus chaos, red-team, impossible and budget suites; fake and live modes; EVALUATION.md with measured numbers only | done (fake mode measured) | `evals/`, `docs/EVALUATION.md`. Live eval **not run**, see below |
 | 13 | Docs: README, ADRs, REPORT_NOTES, THREAT_MODEL, ARCHITECTURE, PROGRESS | done | `docs/` |
 | 14 | Small commits, pushed, authorship audit, lint clean, disk reported | done | see the final summary in the session log; `bun run disk` |
@@ -88,7 +88,7 @@ No live model calls were made in this session.
 - **README fixes:** clone with `--recurse-submodules`; added a `sage doctor` step with an
   explanation of the expected `WARN` lines; added the tested versions; synced the command
   reference with `--help`. `packages/cli/test/docs-sync.test.ts` now enforces that sync.
-- **Full suite:** 106 tests, 0 failures. `bun test --coverage` reports **89.43% lines / 89.31%
+- **Full suite:** 106 tests, 0 failures after Part A; 124 after the website tests were added. `bun test --coverage` reports **89.43% lines / 89.31%
   functions** (in-process code only, see known issue 7). Biome is clean, typecheck is clean, the
   link checker finds 0 broken links, and the fake-mode `sage eval` was regenerated.
 - **Robustness checks** (all are now repeatable tests in `packages/cli/test/`):
