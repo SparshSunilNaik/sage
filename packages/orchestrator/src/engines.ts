@@ -16,5 +16,6 @@ export function makeEngine(cfg: SageConfig, repo: string): EngineAdapter {
     startupTimeoutMs: cfg.engine.opencode.startupTimeoutMs,
     turnTimeoutMs: cfg.engine.opencode.turnTimeoutMs,
     pricing: cfg.engine.opencode.pricing,
+    isolateState: cfg.engine.opencode.isolateState,
   });
 }

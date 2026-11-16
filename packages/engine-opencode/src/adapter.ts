@@ -24,6 +24,8 @@ export interface OpencodeEngineOptions {
   pricing: Record<string, { input: number; output: number }>;
   /** Directory of the guard plugin (default: this repo's packages/guard-plugin). */
   guardPluginDir?: string;
+  /** Private OpenCode DB per task (default true). False uses OpenCode's own store (stored sign-ins). */
+  isolateState?: boolean;
 }
 
 export const GUARD_PLUGIN_DIR = join(import.meta.dir, "..", "..", "guard-plugin", "opencode");
@@ -85,7 +87,7 @@ async function startServer(
       // Repo-supplied OpenCode config is untrusted (it could disable the guard or add tools).
       OPENCODE_DISABLE_PROJECT_CONFIG: "1",
       OPENCODE_DISABLE_CLAUDE_CODE: "1",
-      OPENCODE_DB: join(o.stateDir, "opencode.db"),
+      ...(opts.isolateState === false ? {} : { OPENCODE_DB: join(o.stateDir, "opencode.db") }),
     },
     shell: false,
     windowsHide: true,

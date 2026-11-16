@@ -149,6 +149,9 @@ export const SageConfig = z.object({
           turnTimeoutMs: z.number().int().positive().default(900_000),
           /** Env vars (beyond the scrubbed base env) passed to the engine process, e.g. provider keys. */
           passEnv: z.array(z.string()).default([]),
+          /** true: each task gets a private OpenCode DB (no shared sessions, but also no stored sign-ins).
+           *  false: use OpenCode's own data store, so credentials saved with `opencode auth login` work. */
+          isolateState: z.boolean().default(true),
           /** Price table (USD per 1M tokens) used when the engine does not report a cost. */
           pricing: z
             .record(
