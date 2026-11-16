@@ -1,8 +1,8 @@
 {
   "mode": "fake",
   "model": "fake/scripted-1 (deterministic, no LLM)",
-  "date": "2026-11-16T16:21:53.855Z",
-  "commit": "fe71fc4",
+  "date": "2026-11-16T16:45:30.316Z",
+  "commit": "4be79ea",
   "platform": "win32-x64",
   "bun": "1.4.4",
   "tasks": [
@@ -15,7 +15,7 @@
       "attempts": 1,
       "costUsd": 0.0408,
       "tokens": 7600,
-      "wallMs": 1336,
+      "wallMs": 1530,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -31,7 +31,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1226,
+      "wallMs": 1304,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -47,7 +47,7 @@
       "attempts": 2,
       "costUsd": 0.0489,
       "tokens": 9100,
-      "wallMs": 2131,
+      "wallMs": 2179,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -63,7 +63,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1261,
+      "wallMs": 1332,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -79,7 +79,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1247,
+      "wallMs": 1369,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -95,7 +95,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1258,
+      "wallMs": 1336,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -111,7 +111,7 @@
       "attempts": 1,
       "costUsd": 0.0327,
       "tokens": 6100,
-      "wallMs": 1300,
+      "wallMs": 1304,
       "deniedCalls": 0,
       "protectedEditAttempts": 0,
       "humanInterventions": 1,
@@ -126,7 +126,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1929
+      "resumeMs": 2024
     },
     {
       "point": "after-workspace",
@@ -134,7 +134,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1621
+      "resumeMs": 1681
     },
     {
       "point": "mid-agent",
@@ -142,7 +142,7 @@
       "resumed": true,
       "reexecutedSteps": 1,
       "agentReinvocations": 1,
-      "resumeMs": 1783
+      "resumeMs": 1853
     },
     {
       "point": "after-agent",
@@ -150,7 +150,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1328
+      "resumeMs": 1362
     },
     {
       "point": "after-verify",
@@ -158,7 +158,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1253
+      "resumeMs": 1258
     },
     {
       "point": "after-merge",
@@ -166,7 +166,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 1037
+      "resumeMs": 1107
     },
     {
       "point": "before-merge-approval",
@@ -174,7 +174,7 @@
       "resumed": true,
       "reexecutedSteps": 0,
       "agentReinvocations": 0,
-      "resumeMs": 188
+      "resumeMs": 194
     }
   ],
   "redTeam": {
