@@ -19,7 +19,7 @@ _Last updated: 2026-11-16 (end of the MVP session)._
 | 8 | Merge and oversight: run branch in dependency order; target branch untouched until approve and merge; trailers; machine identity; agent cannot approve | done | `oversight.ts`; e2e and CLI tests |
 | 9 | Traceability: `sage trace` tree; every change attributable to a task | done | `packages/trace`; e2e attribution assertion |
 | 10 | CLI: init, run, plan, status, approve, reject, resume, abort, trace, diff, merge, doctor, gc, eval; Zod-validated JSONC config | done | `packages/cli`; CLI tests |
-| 11 | Tests: state machines, policy, e2e, crash/resume, red team, impossible task; green on Windows | done | 87 tests, 0 failures locally on Windows 11. CI runs on windows-latest and ubuntu-latest |
+| 11 | Tests: state machines, policy, e2e, crash/resume, red team, impossible task; green on Windows | done | 83 tests, 0 failures locally on Windows 11. CI runs on windows-latest and ubuntu-latest |
 | 12 | Eval scaffold: 7 tasks in 3 fixture repos with hidden tests, plus chaos, red-team, impossible and budget suites; fake and live modes; EVALUATION.md with measured numbers only | done (fake mode measured) | `evals/`, `docs/EVALUATION.md`. Live eval **not run**, see below |
 | 13 | Docs: README, ADRs, REPORT_NOTES, THREAT_MODEL, ARCHITECTURE, PROGRESS | done | `docs/` |
 | 14 | Small commits, pushed, authorship audit, lint clean, disk reported | done | see the final summary in the session log; `bun run disk` |
