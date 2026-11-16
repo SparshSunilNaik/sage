@@ -6,5 +6,11 @@
   "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@sage/core": "workspace:*",
+    "@sage/orchestrator": "workspace:*",
+    "@sage/testkit": "workspace:*",
+    "@sage/workspace": "workspace:*"
   }
 }

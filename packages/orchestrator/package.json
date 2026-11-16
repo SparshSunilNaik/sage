@@ -7,5 +7,16 @@
   "types": "src/index.ts",
   "exports": {
     ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@sage/core": "workspace:*",
+    "@sage/workspace": "workspace:*",
+    "@sage/policy": "workspace:*",
+    "@sage/trace": "workspace:*",
+    "@sage/verify": "workspace:*",
+    "@sage/planner": "workspace:*",
+    "@sage/guard-plugin": "workspace:*",
+    "@sage/engine-opencode": "workspace:*",
+    "@sage/testkit": "workspace:*"
   }
 }

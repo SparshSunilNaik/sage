@@ -15,12 +15,23 @@
     "evals": {
       "name": "@sage/evals",
       "version": "0.1.0",
+      "dependencies": {
+        "@sage/core": "workspace:*",
+        "@sage/orchestrator": "workspace:*",
+        "@sage/testkit": "workspace:*",
+        "@sage/workspace": "workspace:*",
+      },
     },
     "packages/cli": {
       "name": "@sage/cli",
       "version": "0.1.0",
       "dependencies": {
         "@clack/prompts": "1.9.0",
+        "@sage/core": "workspace:*",
+        "@sage/engine-opencode": "workspace:*",
+        "@sage/orchestrator": "workspace:*",
+        "@sage/trace": "workspace:*",
+        "@sage/workspace": "workspace:*",
         "commander": "15.1.0",
       },
     },
@@ -35,6 +46,10 @@
     "packages/engine-opencode": {
       "name": "@sage/engine-opencode",
       "version": "0.1.0",
+      "dependencies": {
+        "@sage/core": "workspace:*",
+        "@sage/workspace": "workspace:*",
+      },
     },
     "packages/guard-plugin": {
       "name": "@sage/guard-plugin",
@@ -43,30 +58,62 @@
     "packages/orchestrator": {
       "name": "@sage/orchestrator",
       "version": "0.1.0",
+      "dependencies": {
+        "@sage/core": "workspace:*",
+        "@sage/engine-opencode": "workspace:*",
+        "@sage/guard-plugin": "workspace:*",
+        "@sage/planner": "workspace:*",
+        "@sage/policy": "workspace:*",
+        "@sage/testkit": "workspace:*",
+        "@sage/trace": "workspace:*",
+        "@sage/verify": "workspace:*",
+        "@sage/workspace": "workspace:*",
+      },
     },
     "packages/planner": {
       "name": "@sage/planner",
       "version": "0.1.0",
+      "dependencies": {
+        "@sage/core": "workspace:*",
+      },
     },
     "packages/policy": {
       "name": "@sage/policy",
       "version": "0.1.0",
+      "dependencies": {
+        "@sage/core": "workspace:*",
+      },
     },
     "packages/testkit": {
       "name": "@sage/testkit",
       "version": "0.1.0",
+      "dependencies": {
+        "@sage/core": "workspace:*",
+        "@sage/guard-plugin": "workspace:*",
+        "@sage/workspace": "workspace:*",
+      },
     },
     "packages/trace": {
       "name": "@sage/trace",
       "version": "0.1.0",
+      "dependencies": {
+        "@sage/core": "workspace:*",
+      },
     },
     "packages/verify": {
       "name": "@sage/verify",
       "version": "0.1.0",
+      "dependencies": {
+        "@sage/core": "workspace:*",
+        "@sage/workspace": "workspace:*",
+      },
     },
     "packages/workspace": {
       "name": "@sage/workspace",
       "version": "0.1.0",
+      "dependencies": {
+        "@sage/testkit": "workspace:*",
+      },
     },
   },
   "packages": {
