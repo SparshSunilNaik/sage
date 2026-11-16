@@ -26,7 +26,7 @@ export interface OpencodeEngineOptions {
   guardPluginDir?: string;
 }
 
-export const GUARD_PLUGIN_DIR = join(import.meta.dir, "..", "..", "guard-plugin");
+export const GUARD_PLUGIN_DIR = join(import.meta.dir, "..", "..", "guard-plugin", "opencode");
 
 export function parseModel(m: string | undefined): { providerID: string; id: string } | undefined {
   if (!m) return undefined;
@@ -288,7 +288,12 @@ export class OpencodeEngine implements EngineAdapter {
         }
       }
       // Fail closed: refuse to run an agent unless the guard plugin is loaded and active.
-      const plugins = (await http.plugins(o.cwd)).data;
+      // Plugins load lazily the first time a location is used: the first listing can be empty.
+      let plugins = (await http.plugins(o.cwd)).data;
+      while (plugins.length === 0 && Date.now() < deadline) {
+        await Bun.sleep(250);
+        plugins = (await http.plugins(o.cwd)).data;
+      }
       const guard = plugins.find((p) => p.id === "sage-guard");
       if (guard?.state.status !== "active") {
         throw new Error(
