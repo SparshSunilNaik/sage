@@ -143,3 +143,59 @@ No live model calls were made in this session.
   global OpenCode is 2.0.29.
 - Disk use is 1.44 GB in total (`bun run disk`), including about 0.7 GB for `.cache` (the Bun cache plus the OpenCode 2.3.0 binary).
   Leftover test fixtures in temp were removed at the end of the session.
+
+## Session 2 (2026-11-16): project website
+
+- **Location:** a static site in `docs/` for GitHub Pages ("Deploy from a branch", `main`, `/docs`).
+  - `docs/index.html` and `docs/404.html`.
+  - Assets are in `docs/site/` (css, js, img), plus `docs/.nojekyll`.
+  - There is no build step, no framework, no external scripts, no trackers and no web fonts (system
+    font stacks only).
+  - Page weight is about 62 KB (HTML + CSS + JS + icon), plus a 60 KB social preview PNG that is
+    only fetched by link unfurlers.
+- **Content:**
+  - a hero with real captured `sage run` and `sage trace` output;
+  - the problem, with three sourced facts from research.md;
+  - a hand-built inline SVG architecture diagram and the run lifecycle;
+  - outcome-framed features tied to gaps G1–G7;
+  - install and quickstart, using the commands verified in the fresh-clone test;
+  - use cases and non-use cases;
+  - evidence, labelled as fake-engine results;
+  - limitations, and a footer.
+- **Design:** a typeset engineering-paper look with a terminal accent.
+  - Serif text and monospace for machine output, warm paper neutrals and one vermilion accent.
+  - Numbered section rail (§1–§7).
+  - Light and dark via `prefers-color-scheme`, plus a remembered manual toggle (localStorage
+    wrapped in try/catch; `?theme=` for testing).
+- **Tooling:**
+  - `scripts/serve-site.ts` serves `docs/` under `/sage/` like GitHub Pages; `--check` crawls
+    every page, asset and `#anchor`.
+  - `scripts/check-links.ts` checks relative links in README, docs and the site, including
+    anchors and absolute site URLs.
+  - `scripts/site.test.ts` runs both in `bun test`, and also checks that there are no external
+    scripts or root-absolute paths.
+- **Verification:**
+  - HTML is valid (html-validate, recommended rules).
+  - Heading order is correct with a single h1. Landmarks, a skip link, visible focus and labelled
+    SVGs are in place.
+  - WCAG AA contrast is computed for 30 colour pairs across both themes; all pass.
+  - Screenshots were taken at 375/768/1440 px in light and dark (Edge headless full-page, plus the
+    in-app browser for section detail). They are kept in `.cache/shots/`, not committed.
+- **Critique-and-fix rounds:**
+  1. Terminal output unreadable: the inline-`code` style leaked into it, painting light bars over
+     the text. The hero heading wrapped to 5 lines. The theme-toggle label was ambiguous. In the
+     diagram, edges crossed, labels collided and monospace notes overflowed their boxes. The
+     diagram was re-laid out so that no edges cross.
+  2. At 375 px the page laid out 606 px wide: the round-1 hero override beat the mobile media
+     query. The mobile nav reorder targeted the wrong element. Long commands scrolled under the
+     copy button (they now wrap on narrow screens). The evidence table scrolled sideways (it now
+     stacks per row). The wordmark square was invisible in dark mode (it now uses theme tokens).
+     `--yes` broke across lines inside the lifecycle cells. html-validate flagged `aria-label` on a
+     plain `<ol>` and `<pre>`.
+  3. At 1440 px the longest demo command scrolled inside a code block narrower than its column
+     (code blocks widened). The theme toggle was verified to persist across reloads over the
+     system preference.
+- **Social preview:** `docs/site/img/social.svg` is the original, exported to `social.png`
+  (1200×630) with Edge headless.
+- **License:** the repository has no LICENSE file yet. The footer says so and does not claim one.
+  Choosing a license is left to the author.

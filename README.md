@@ -29,6 +29,8 @@ flowchart LR
   trace[(trace<br/>goal→plan→calls→diffs→gates)] -.- sched
 ```
 
+**Website:** <https://sparshsunilnaik.github.io/sage/> (static, served by GitHub Pages from `docs/`)
+
 More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) · [ADRs](docs/adr/) ·
 [docs/EVALUATION.md](docs/EVALUATION.md) · [PROGRESS.md](PROGRESS.md)

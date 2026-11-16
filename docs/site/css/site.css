@@ -1150,3 +1150,10 @@ strong {
 .wm-fg {
   stroke: var(--paper);
 }
+
+/* round 3: let the longest documented command fit on one line at desktop widths */
+.code,
+.split,
+.steps {
+  max-width: 56rem;
+}
