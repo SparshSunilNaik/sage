@@ -9,6 +9,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@sage/core": "workspace:*"
+    "@sage/core": "workspace:*",
+    "@sage/testkit": "workspace:*"
   }
 }
