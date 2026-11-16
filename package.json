@@ -10,7 +10,9 @@
     "lint:fix": "bun run scripts/lint.ts --write",
     
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "disk": "bun run scripts/disk-usage.ts"
+    "disk": "bun run scripts/disk-usage.ts",
+    "demo": "bun run scripts/demo.ts",
+    "probe": "bun run scripts/engine-probe.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
