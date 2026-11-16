@@ -62,10 +62,13 @@ More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 ## Quickstart (Windows-friendly; also works on Linux/macOS)
 
 Prerequisites: **git** and **Bun ≥ 1.4** (`npm i -g bun`, or `powershell -c "irm bun.sh/install.ps1 | iex"`).
-No Docker, WSL or VM needed.
+For real-model runs you also need **OpenCode 2.x**. SAGE was tested with Bun 1.4.4, git 2.55 and
+OpenCode 2.3.0 (and 2.0.29) on Windows 11, and its CI runs on Ubuntu and Windows.
+No Docker, WSL or VM needed. The commands below work unchanged in Git Bash, PowerShell, and
+macOS/Linux shells.
 
 ```bash
-git clone https://github.com/SparshSunilNaik/sage.git
+git clone --recurse-submodules https://github.com/SparshSunilNaik/sage.git
 ```
 
 ```bash
@@ -81,6 +84,17 @@ bun test
 ```
 
 The test suite makes **zero** model calls; it uses a deterministic fake engine.
+
+```bash
+bun run sage doctor
+```
+
+`doctor` checks Bun, git and your git identity, the OpenCode binary against the fork's version,
+and which OpenCode sign-ins or provider keys exist (names only, never values). It also reports disk
+usage. Lines marked `WARN` about OpenCode or provider keys are expected until you set up a real
+model, and they do not block the fake-engine demo. The submodule (`engine/opencode`) is only used
+to read the engine version and the plugin API, so a clone without `--recurse-submodules` still
+works, but `doctor` will report the fork as missing.
 
 ### Try it without a model (fake engine, free)
 

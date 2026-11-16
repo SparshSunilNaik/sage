@@ -1,5 +1,4 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
 import { CONFIG_FILE, CONFIG_TEMPLATE, type Plan, type RunState } from "@sage/core";
 import {
@@ -34,6 +33,7 @@ import {
   secretNames,
 } from "@sage/workspace";
 import { type Ctx, context, err, money, out } from "./context.ts";
+import { parseAuthList, parseEngineVersion } from "./doctor-util.ts";
 import { ClackAsker, confirmPlan, formatPlan, isInteractive } from "./interactive.ts";
 
 export interface GlobalOpts {
@@ -282,7 +282,7 @@ export async function cmdDoctor(o: GlobalOpts) {
       cwd: c.repo,
       timeoutMs: 20_000,
     });
-    const engineVersion = (ov.stdout || ov.stderr).trim().split(/\s+/).pop() ?? "";
+    const engineVersion = parseEngineVersion(ov.stdout || ov.stderr);
     add(
       "opencode engine",
       ov.code === 0 && engineVersion === forkVersion,
@@ -293,21 +293,29 @@ export async function cmdDoctor(o: GlobalOpts) {
   } catch (e) {
     add("repository", false, (e as Error).message);
   }
+  // OpenCode 2.x stores credentials in its database; ask it which integrations are configured.
+  let bin = "opencode";
+  try {
+    bin = (await context(o)).config.engine.opencode.bin;
+  } catch {
+    /* default */
+  }
+  const auth = await runProcess([bin, "auth", "list"], { cwd: process.cwd(), timeoutMs: 30_000 });
+  const integrations = auth.code === 0 ? parseAuthList(auth.stdout) : [];
+  add(
+    "opencode sign-ins",
+    integrations.length > 0,
+    auth.code !== 0
+      ? `could not run '${bin} auth list'`
+      : integrations.length
+        ? `${integrations.join(", ")} (names only; credentials stay in OpenCode)`
+        : "none (run `opencode auth login`, or pass provider keys via engine.opencode.passEnv)",
+  );
   const present = PROVIDER_VARS.filter((k) => process.env[k]);
   add(
     "provider env keys",
     present.length > 0,
     present.length ? `set: ${present.join(", ")} (values not shown)` : "none set",
-  );
-  const authFile = join(
-    process.env.XDG_DATA_HOME ?? join(homedir(), ".local", "share"),
-    "opencode",
-    "auth.json",
-  );
-  add(
-    "opencode auth store",
-    existsSync(authFile),
-    existsSync(authFile) ? `${authFile} present (contents not read)` : "not found",
   );
   add(
     "secret-like env vars",
