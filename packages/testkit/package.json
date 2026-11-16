@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@sage/core": "workspace:*",
+    "@sage/guard-plugin": "workspace:*",
     "@sage/workspace": "workspace:*",
-    "@sage/guard-plugin": "workspace:*"
+    "zod": "4.6.7"
   }
 }
