@@ -117,7 +117,7 @@ export class OpencodeHttp {
   messages(sessionId: string) {
     return this.json(
       "GET",
-      `/api/session/${sessionId}/message?order=asc&limit=500`,
+      `/api/session/${sessionId}/message?order=asc&limit=200`,
       z.object({ data: z.array(Message) }),
     );
   }
