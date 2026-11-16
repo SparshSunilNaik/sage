@@ -17,9 +17,20 @@ mkdirSync(join(root, ".cache"), { recursive: true });
 renameSync(tmp, target);
 const scenario = join(root, ".cache", "demo-scenario.json");
 writeScenario(scenario, calcScenario());
-const init = await runProcess([process.execPath, join(root, "packages", "cli", "src", "bin.ts"), "-C", target, "init", "--fake", scenario], {
-  cwd: target,
-});
+const init = await runProcess(
+  [
+    process.execPath,
+    join(root, "packages", "cli", "src", "bin.ts"),
+    "-C",
+    target,
+    "init",
+    "--fake",
+    scenario,
+  ],
+  {
+    cwd: target,
+  },
+);
 process.stdout.write(init.stdout);
 console.log(`
 Demo repo ready: ${target}

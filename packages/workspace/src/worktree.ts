@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, realpathSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { git, gitTry, headSha } from "./git.ts";
 
@@ -24,8 +24,19 @@ export async function listWorktrees(repo: string): Promise<WorktreeInfo[]> {
   return res;
 }
 
+/** Canonical form for comparisons: the real path (expands Windows 8.3 short names like RUNNER~1). */
+function canonical(p: string): string {
+  let r = resolve(p);
+  try {
+    if (existsSync(r)) r = realpathSync.native(r);
+  } catch {
+    /* keep the resolved path */
+  }
+  return r.replace(/\\/g, "/").replace(/\/$/, "");
+}
+
 function samePath(a: string, b: string): boolean {
-  const n = (p: string) => resolve(p).replace(/\\/g, "/").replace(/\/$/, "");
+  const n = canonical;
   return process.platform === "win32" ? n(a).toLowerCase() === n(b).toLowerCase() : n(a) === n(b);
 }
 
