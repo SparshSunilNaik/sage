@@ -15,6 +15,11 @@
     "@sage/workspace": "workspace:*",
     "@sage/orchestrator": "workspace:*",
     "@sage/trace": "workspace:*",
-    "@sage/engine-opencode": "workspace:*"
+    "@sage/engine-opencode": "workspace:*",
+    "@sage/evals": "workspace:*",
+    "@sage/testkit": "workspace:*"
+  },
+  "bin": {
+    "sage": "src/bin.ts"
   }
 }

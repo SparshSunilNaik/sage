@@ -25,11 +25,16 @@
     "packages/cli": {
       "name": "@sage/cli",
       "version": "0.1.0",
+      "bin": {
+        "sage": "src/bin.ts",
+      },
       "dependencies": {
         "@clack/prompts": "1.9.0",
         "@sage/core": "workspace:*",
         "@sage/engine-opencode": "workspace:*",
+        "@sage/evals": "workspace:*",
         "@sage/orchestrator": "workspace:*",
+        "@sage/testkit": "workspace:*",
         "@sage/trace": "workspace:*",
         "@sage/workspace": "workspace:*",
         "commander": "15.1.0",

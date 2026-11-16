@@ -1,4 +1,7 @@
-import { afterAll, describe, expect, test } from "bun:test";
+import { afterAll, describe, expect, setDefaultTimeout, test } from "bun:test";
+
+setDefaultTimeout(180_000);
+
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
