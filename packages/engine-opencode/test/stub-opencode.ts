@@ -22,9 +22,11 @@ const pluginState: { id?: string; state: { status: string; error?: string } }[] 
 for (const p of cfg.plugins ?? []) {
   try {
     const dir = fileURLToPath(p.package);
-    const pkg = JSON.parse(await Bun.file(resolve(dir, "package.json")).text()) as {
-      exports?: { ".": string };
-    };
+    // Like OpenCode's host: a directory without package.json resolves to its index file.
+    const manifest = Bun.file(resolve(dir, "package.json"));
+    const pkg = (await manifest.exists())
+      ? (JSON.parse(await manifest.text()) as { exports?: { ".": string } })
+      : {};
     const mod = (await import(resolve(dir, pkg.exports?.["."] ?? "index.ts"))) as {
       default: { id: string; setup: (c: unknown) => Promise<unknown> };
     };
