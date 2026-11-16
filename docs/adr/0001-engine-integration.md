@@ -103,3 +103,18 @@ are mapped to `shell`/`edit` in config.)
 
 - Upgrading OpenCode touches one package. V1/V2 churn (research.md §3.3) is contained.
 - Known API limitations are listed in `docs/upstream-candidates.md`.
+
+## Validation (added after implementation)
+
+- `scripts/engine-probe.ts` starts the real engine through the adapter, waits for the guard plugin
+  to report `active` in `GET /api/plugin`, and creates a session (no prompt, no LLM cost). It passes
+  against the released **2.3.0** binary (installed project-locally in `.cache/opencode-2.3.0`) and
+  against the user's globally installed **2.0.29** binary.
+- Two integration issues found by the probe and fixed: (1) a local plugin directory with a named
+  `package.json` is resolved by package name and silently dropped, so OpenCode is pointed at
+  `packages/guard-plugin/opencode/` instead; (2) plugins load lazily, so the adapter polls
+  `/api/plugin` until it is non-empty. Both are in `docs/upstream-candidates.md`.
+- OpenCode V2 stores credentials in its SQLite DB, so a per-task `OPENCODE_DB` cannot see stored
+  sign-ins. `engine.opencode.isolateState` (default `true`) can be set to `false` to use OpenCode's
+  own store (SAGE sessions then also appear in the user's OpenCode history).
+- A live run through the 2.0.29 binary is recorded in `docs/evidence/live-smoke-2026-11-16.md`.
