@@ -22,7 +22,8 @@ function walk(dir: string, out: string[]): void {
     const p = join(dir, name);
     const st = statSync(p);
     if (st.isDirectory()) walk(p, out);
-    else if (/\.(ts|tsx|js|mjs|json)$/.test(name)) out.push(p);
+    // evals/last-*.json are generated reports, not source.
+    else if (/.(ts|tsx|js|mjs|json)$/.test(name) && !/^last-(fake|live).json$/.test(name)) out.push(p);
   }
 }
 
