@@ -9,7 +9,7 @@
     "lint": "bun run scripts/lint.ts",
     "lint:fix": "bun run scripts/lint.ts --write",
     
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "bun node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
     "disk": "bun run scripts/disk-usage.ts",
     "demo": "bun run scripts/demo.ts",
     "probe": "bun run scripts/engine-probe.ts"

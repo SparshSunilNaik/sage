@@ -25,5 +25,7 @@ Development happens on Windows 11 with Git Bash. Constraints: no Docker/WSL/VMs,
 6. **OpenCode binary:** the released `@opencode/cli@2.3.0` (same version as the fork) is installed
    project-locally under `.cache/opencode-2.3.0/` for probing; it runs on this machine (it is
    signed). Building the fork from source was not needed (ADR 0001 §5).
-7. **Test timeouts:** `bunfig.toml`'s `[test] timeout` is not honoured by Bun 1.4.4 on this
+7. **`.bin` shims:** Bun creates `node_modules/.bin/*.exe` shims on Windows, which Application Control
+   also blocks, so `bun run typecheck` runs `bun node_modules/typescript/bin/tsc` directly.
+8. **Test timeouts:** `bunfig.toml`'s `[test] timeout` is not honoured by Bun 1.4.4 on this
    machine, so long-running test files call `setDefaultTimeout()`.
