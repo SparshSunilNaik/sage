@@ -19,6 +19,7 @@
         "@sage/core": "workspace:*",
         "@sage/orchestrator": "workspace:*",
         "@sage/testkit": "workspace:*",
+        "@sage/verify": "workspace:*",
         "@sage/workspace": "workspace:*",
       },
     },
