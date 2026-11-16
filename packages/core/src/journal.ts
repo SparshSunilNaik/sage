@@ -28,11 +28,13 @@ export class Journal {
   static open(path: string): Journal {
     if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
     const sqlite = new Database(path, { create: true });
+    // Set the busy timeout first: several SAGE processes (concurrent runs, `sage approve` from
+    // another terminal) share one DB, and even switching to WAL needs a lock.
+    sqlite.exec("PRAGMA busy_timeout = 15000;");
     sqlite.exec("PRAGMA journal_mode = WAL;");
     // FULL: every committed transaction is durable before append() returns. This is what makes
     // "journal before side effect" meaningful across a hard kill.
     sqlite.exec("PRAGMA synchronous = FULL;");
-    sqlite.exec("PRAGMA busy_timeout = 10000;");
     sqlite.exec(schema.DDL);
     return new Journal(sqlite, path);
   }
@@ -45,17 +47,23 @@ export class Journal {
   append(runId: string, taskId: string | null, actor: Actor, payload: EventPayload): EventRecord {
     const p = EventPayload.parse(payload);
     const ts = new Date().toISOString();
-    return this.db.transaction((tx) => {
-      this.checkInvariants(tx, runId, taskId, p);
-      const row = tx
-        .insert(schema.events)
-        .values({ ts, runId, taskId, actor, type: p.type, payload: JSON.stringify(p) })
-        .returning({ seq: schema.events.seq })
-        .get();
-      const rec: EventRecord = { seq: row.seq, ts, runId, taskId, actor, payload: p };
-      project(tx, rec);
-      return rec;
-    });
+    return this.db.transaction(
+      (tx) => {
+        this.checkInvariants(tx, runId, taskId, p);
+        const row = tx
+          .insert(schema.events)
+          .values({ ts, runId, taskId, actor, type: p.type, payload: JSON.stringify(p) })
+          .returning({ seq: schema.events.seq })
+          .get();
+        const rec: EventRecord = { seq: row.seq, ts, runId, taskId, actor, payload: p };
+        project(tx, rec);
+        return rec;
+        // IMMEDIATE takes the write lock up front. A DEFERRED transaction that reads and then writes
+        // gets SQLITE_BUSY without waiting when another process holds the lock (no busy-handler
+        // retry for lock upgrades), which surfaced as "database is locked" with concurrent runs.
+      },
+      { behavior: "immediate" },
+    );
   }
 
   private checkInvariants(tx: Db, runId: string, taskId: string | null, p: EventPayload): void {
@@ -236,18 +244,20 @@ export class Journal {
     ttlMs: number,
     now = Date.now(),
   ): { ok: true } | { ok: false; holder: string; expiresAt: number } {
-    const res = this.sqlite.transaction(() => {
-      const cur = this.db.select().from(schema.leases).where(eq(schema.leases.runId, runId)).get();
-      if (cur && cur.owner !== owner && cur.expiresAt > now) {
-        return { ok: false as const, holder: cur.owner, expiresAt: cur.expiresAt };
-      }
-      this.db
-        .insert(schema.leases)
-        .values({ runId, owner, expiresAt: now + ttlMs })
-        .onConflictDoUpdate({ target: schema.leases.runId, set: { owner, expiresAt: now + ttlMs } })
-        .run();
-      return { ok: true as const };
-    })();
+    const res = this.sqlite
+      .transaction(() => {
+        const cur = this.db.select().from(schema.leases).where(eq(schema.leases.runId, runId)).get();
+        if (cur && cur.owner !== owner && cur.expiresAt > now) {
+          return { ok: false as const, holder: cur.owner, expiresAt: cur.expiresAt };
+        }
+        this.db
+          .insert(schema.leases)
+          .values({ runId, owner, expiresAt: now + ttlMs })
+          .onConflictDoUpdate({ target: schema.leases.runId, set: { owner, expiresAt: now + ttlMs } })
+          .run();
+        return { ok: true as const };
+      })
+      .immediate();
     if (res.ok) this.append(runId, null, "sage", { type: "lease.acquired", owner, expiresAt: now + ttlMs });
     return res;
   }
@@ -273,22 +283,25 @@ export class Journal {
   /** Drop all projections and replay the event log. Used to prove derived state = f(events). */
   rebuild(): void {
     const all = this.db.select().from(schema.events).orderBy(asc(schema.events.seq)).all();
-    this.db.transaction((tx) => {
-      tx.delete(schema.runs).run();
-      tx.delete(schema.tasks).run();
-      tx.delete(schema.steps).run();
-      tx.delete(schema.approvals).run();
-      for (const e of all) {
-        project(tx, {
-          seq: e.seq,
-          ts: e.ts,
-          runId: e.runId,
-          taskId: e.taskId,
-          actor: e.actor as Actor,
-          payload: EventPayload.parse(JSON.parse(e.payload)),
-        });
-      }
-    });
+    this.db.transaction(
+      (tx) => {
+        tx.delete(schema.runs).run();
+        tx.delete(schema.tasks).run();
+        tx.delete(schema.steps).run();
+        tx.delete(schema.approvals).run();
+        for (const e of all) {
+          project(tx, {
+            seq: e.seq,
+            ts: e.ts,
+            runId: e.runId,
+            taskId: e.taskId,
+            actor: e.actor as Actor,
+            payload: EventPayload.parse(JSON.parse(e.payload)),
+          });
+        }
+      },
+      { behavior: "immediate" },
+    );
   }
 
   countEvents(runId: string, type?: string): number {
