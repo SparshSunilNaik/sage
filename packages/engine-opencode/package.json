@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@sage/core": "workspace:*",
-    "@sage/workspace": "workspace:*"
+    "@sage/workspace": "workspace:*",
+    "@sage/orchestrator": "workspace:*",
+    "@sage/testkit": "workspace:*",
+    "zod": "4.6.7"
   }
 }

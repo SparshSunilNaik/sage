@@ -53,7 +53,10 @@
       "version": "0.1.0",
       "dependencies": {
         "@sage/core": "workspace:*",
+        "@sage/orchestrator": "workspace:*",
+        "@sage/testkit": "workspace:*",
         "@sage/workspace": "workspace:*",
+        "zod": "4.6.7",
       },
     },
     "packages/guard-plugin": {
