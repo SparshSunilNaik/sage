@@ -50,7 +50,10 @@ export function startServer(port: number) {
         });
       }
       return new Response(Bun.file(f), {
-        headers: { "content-type": TYPES[extname(f)] ?? "application/octet-stream", "cache-control": "no-store" },
+        headers: {
+          "content-type": TYPES[extname(f)] ?? "application/octet-stream",
+          "cache-control": "no-store",
+        },
       });
     },
   });
@@ -80,14 +83,16 @@ export async function crawl(base: string): Promise<string[]> {
       if (/^(https?:|mailto:|data:)/.test(raw) && !raw.startsWith(base)) continue;
       const abs = new URL(raw, u);
       if (abs.origin !== base) continue;
-      if (raw.startsWith("/")) problems.push(`root-absolute link '${raw}' in ${u.replace(base, "")} (breaks on GitHub Pages)`);
+      if (raw.startsWith("/"))
+        problems.push(`root-absolute link '${raw}' in ${u.replace(base, "")} (breaks on GitHub Pages)`);
       const page = abs.href.split("#")[0]!;
       if (abs.hash) anchorChecks.push([u, page, abs.hash.slice(1)]);
       queue.push(page);
     }
   }
   for (const [from, page, id] of anchorChecks) {
-    if (!ids.get(page)?.has(id)) problems.push(`missing anchor #${id} (linked from ${from.replace(base, "")})`);
+    if (!ids.get(page)?.has(id))
+      problems.push(`missing anchor #${id} (linked from ${from.replace(base, "")})`);
   }
   return problems;
 }

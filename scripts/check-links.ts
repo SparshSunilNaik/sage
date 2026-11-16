@@ -83,7 +83,11 @@ for (const file of files) {
     // Absolute URLs into the published site (og:image, canonical, 404 home link) must exist locally.
     if (link.startsWith(SITE)) {
       checked++;
-      const local = resolve(root, "docs", decodeURIComponent(link.slice(SITE.length).split("#")[0] || "index.html"));
+      const local = resolve(
+        root,
+        "docs",
+        decodeURIComponent(link.slice(SITE.length).split("#")[0] || "index.html"),
+      );
       if (!existsSync(local)) problems.push(`${rel}: '${link}' -> missing ${relative(root, local)}`);
       continue;
     }
