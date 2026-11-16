@@ -107,6 +107,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@sage/core": "workspace:*",
+        "@sage/testkit": "workspace:*",
         "@sage/workspace": "workspace:*",
       },
     },

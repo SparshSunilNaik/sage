@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@sage/core": "workspace:*",
-    "@sage/workspace": "workspace:*"
+    "@sage/workspace": "workspace:*",
+    "@sage/testkit": "workspace:*"
   }
 }
