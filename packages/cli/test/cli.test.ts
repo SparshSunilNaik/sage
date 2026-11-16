@@ -98,53 +98,61 @@ const CRASH_POINTS = [
 ];
 
 describe("crash and resume", () => {
-  for (const point of CRASH_POINTS) {
-    test(`kill -9 at '${point}' then resume continues without duplicated side effects`, async () => {
-      const { repo, scenario, log } = await setup();
-      await sage(repo, ["init", "--fake", scenario]);
-      const crashed = await sage(repo, ["run", "add multiply and subtract", "--yes"], {
-        SAGE_FAKE_LOG: log,
-        SAGE_CRASH_AT: point,
+  // Every kill point is repeated (default 3x) to catch flakiness; override with SAGE_CRASH_REPEAT.
+  const REPEAT = Number(process.env.SAGE_CRASH_REPEAT ?? 3);
+  for (let rep = 1; rep <= REPEAT; rep++)
+    for (const point of CRASH_POINTS) {
+      test(`kill -9 at '${point}' (round ${rep}) then resume continues without duplicated side effects`, async () => {
+        const { repo, scenario, log } = await setup();
+        await sage(repo, ["init", "--fake", scenario]);
+        const crashed = await sage(repo, ["run", "add multiply and subtract", "--yes"], {
+          SAGE_FAKE_LOG: log,
+          SAGE_CRASH_AT: point,
+        });
+        expect(crashed.code).not.toBe(0); // the process was killed
+        const j = Journal.open(dbPath(repo));
+        const runId = j.resolveRunId("latest");
+        expect(j.mustRun(runId).state).not.toBe("AWAITING_MERGE_APPROVAL");
+        j.close();
+
+        // --yes restates the human pre-approval: if the crash happened before it was journaled, resume asks again.
+        const resumed = await sage(repo, ["resume", runId, "--yes"], { SAGE_FAKE_LOG: log });
+        expect(resumed.stderr).not.toContain("sage: ");
+        expect(resumed.code).toBe(0);
+
+        const j2 = Journal.open(dbPath(repo));
+        const run = j2.mustRun(runId);
+        expect(run.state).toBe("AWAITING_MERGE_APPROVAL");
+        expect(j2.getTasks(runId).map((t) => [t.id, t.state, t.attempt])).toEqual([
+          ["multiply", "PASSED", 1],
+          ["subtract", "PASSED", 1],
+        ]);
+        // Completed steps are never repeated: one step.done per key.
+        const doneKeys = j2
+          .events(runId)
+          .flatMap((e) => (e.payload.type === "step.done" ? [`${e.taskId ?? ""}/${e.payload.key}`] : []));
+        expect(new Set(doneKeys).size).toBe(doneKeys.length);
+        // The agent is re-invoked only if it was killed mid-turn (its step was not complete).
+        const execs = readFakeLog(log).filter((l) => l.role === "executor");
+        const perTask = (id: string) => execs.filter((l) => l.taskId === id).length;
+        expect(perTask("multiply")).toBe(point === "mid-agent" ? 2 : 1);
+        expect(perTask("subtract")).toBe(1);
+        const planners = readFakeLog(log).filter((l) => l.role === "planner").length;
+        expect(planners).toBe(1);
+        // No duplicated git side effects: exactly one merge per task and no double-applied edits.
+        const merges = await git(repo, [
+          "log",
+          "--merges",
+          "--format=%s",
+          `${run.baseSha}..${run.runBranch}`,
+        ]);
+        expect(merges.split("\n").filter(Boolean)).toHaveLength(2);
+        const src = await git(repo, ["show", `${run.runBranch}:src/math.ts`]);
+        expect(src.match(/export function multiply/g)).toHaveLength(1);
+        expect(src.match(/export function subtract/g)).toHaveLength(1);
+        // Target branch untouched.
+        expect(await git(repo, ["rev-parse", "main"])).toBe(run.baseSha);
+        j2.close();
       });
-      expect(crashed.code).not.toBe(0); // the process was killed
-      const j = Journal.open(dbPath(repo));
-      const runId = j.resolveRunId("latest");
-      expect(j.mustRun(runId).state).not.toBe("AWAITING_MERGE_APPROVAL");
-      j.close();
-
-      // --yes restates the human pre-approval: if the crash happened before it was journaled, resume asks again.
-      const resumed = await sage(repo, ["resume", runId, "--yes"], { SAGE_FAKE_LOG: log });
-      expect(resumed.stderr).not.toContain("sage: ");
-      expect(resumed.code).toBe(0);
-
-      const j2 = Journal.open(dbPath(repo));
-      const run = j2.mustRun(runId);
-      expect(run.state).toBe("AWAITING_MERGE_APPROVAL");
-      expect(j2.getTasks(runId).map((t) => [t.id, t.state, t.attempt])).toEqual([
-        ["multiply", "PASSED", 1],
-        ["subtract", "PASSED", 1],
-      ]);
-      // Completed steps are never repeated: one step.done per key.
-      const doneKeys = j2
-        .events(runId)
-        .flatMap((e) => (e.payload.type === "step.done" ? [`${e.taskId ?? ""}/${e.payload.key}`] : []));
-      expect(new Set(doneKeys).size).toBe(doneKeys.length);
-      // The agent is re-invoked only if it was killed mid-turn (its step was not complete).
-      const execs = readFakeLog(log).filter((l) => l.role === "executor");
-      const perTask = (id: string) => execs.filter((l) => l.taskId === id).length;
-      expect(perTask("multiply")).toBe(point === "mid-agent" ? 2 : 1);
-      expect(perTask("subtract")).toBe(1);
-      const planners = readFakeLog(log).filter((l) => l.role === "planner").length;
-      expect(planners).toBe(1);
-      // No duplicated git side effects: exactly one merge per task and no double-applied edits.
-      const merges = await git(repo, ["log", "--merges", "--format=%s", `${run.baseSha}..${run.runBranch}`]);
-      expect(merges.split("\n").filter(Boolean)).toHaveLength(2);
-      const src = await git(repo, ["show", `${run.runBranch}:src/math.ts`]);
-      expect(src.match(/export function multiply/g)).toHaveLength(1);
-      expect(src.match(/export function subtract/g)).toHaveLength(1);
-      // Target branch untouched.
-      expect(await git(repo, ["rev-parse", "main"])).toBe(run.baseSha);
-      j2.close();
-    });
-  }
+    }
 });

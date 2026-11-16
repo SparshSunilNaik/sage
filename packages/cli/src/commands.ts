@@ -1,6 +1,7 @@
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { CONFIG_FILE, CONFIG_TEMPLATE, type Plan, type RunState } from "@sage/core";
+import { ENGINE_PID_FILE } from "@sage/engine-opencode";
 import {
   abort,
   approve,
@@ -28,6 +29,8 @@ import {
   gitCommonDir,
   gitIdentity,
   gitTry,
+  isProcessAlive,
+  killTree,
   removeWorktree,
   runProcess,
   secretNames,
@@ -331,6 +334,19 @@ export async function cmdDoctor(o: GlobalOpts) {
 
 /* ------------------------------------ gc ------------------------------------- */
 
+/** Pids recorded by engine processes under a run's engine state directory. */
+export function enginePids(dir: string): number[] {
+  if (!existsSync(dir)) return [];
+  const pids: number[] = [];
+  for (const sub of readdirSync(dir)) {
+    const f = join(dir, sub, ENGINE_PID_FILE);
+    if (!existsSync(f)) continue;
+    const pid = Number(readFileSync(f, "utf8").trim());
+    if (Number.isInteger(pid) && pid > 0) pids.push(pid);
+  }
+  return pids;
+}
+
 export async function cmdGc(o: GlobalOpts & { all?: boolean; dryRun?: boolean; branches?: boolean }) {
   const c = await context(o);
   const terminal: RunState[] = o.all ? ["MERGED", "ABORTED", "FAILED"] : ["MERGED", "ABORTED"];
@@ -343,6 +359,13 @@ export async function cmdGc(o: GlobalOpts & { all?: boolean; dryRun?: boolean; b
     if (size === 0 && !o.branches) continue;
     out(`${o.dryRun ? "would remove" : "removing"} worktrees of ${r.id} (${r.state}, ${formatBytes(size)})`);
     if (o.dryRun) continue;
+    // Engine servers left behind by a killed orchestrator (their pid files survive the crash).
+    for (const pid of enginePids(eng)) {
+      if (isProcessAlive(pid)) {
+        killTree(pid);
+        out(`  killed leftover engine process ${pid}`);
+      }
+    }
     for (const t of c.journal.getTasks(r.id)) {
       if (t.worktree) await removeWorktree(c.repo, t.worktree);
       if (o.branches) await gitTry(c.repo, ["branch", "-D", taskBranch(r.id, t.id)]);
