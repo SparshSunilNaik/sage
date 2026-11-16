@@ -3,7 +3,7 @@
 This file is updated in the same commits as the work it describes. The git history plus this file
 should be enough to resume after an interruption.
 
-_Last updated: 2026-11-16 (end of the MVP session)._
+_Last updated: 2026-11-16 (session 2: verification and website)._
 
 ## MVP checklist
 
@@ -19,7 +19,7 @@ _Last updated: 2026-11-16 (end of the MVP session)._
 | 8 | Merge and oversight: run branch in dependency order; target branch untouched until approve and merge; trailers; machine identity; agent cannot approve | done | `oversight.ts`; e2e and CLI tests |
 | 9 | Traceability: `sage trace` tree; every change attributable to a task | done | `packages/trace`; e2e attribution assertion |
 | 10 | CLI: init, run, plan, status, approve, reject, resume, abort, trace, diff, merge, doctor, gc, eval; Zod-validated JSONC config | done | `packages/cli`; CLI tests |
-| 11 | Tests: state machines, policy, e2e, crash/resume, red team, impossible task; green on Windows | done | 83 tests, 0 failures locally on Windows 11. CI runs on windows-latest and ubuntu-latest |
+| 11 | Tests: state machines, policy, e2e, crash/resume, red team, impossible task; green on Windows | done | 106 tests, 0 failures (session 2). CI is green on windows-latest and ubuntu-latest |
 | 12 | Eval scaffold: 7 tasks in 3 fixture repos with hidden tests, plus chaos, red-team, impossible and budget suites; fake and live modes; EVALUATION.md with measured numbers only | done (fake mode measured) | `evals/`, `docs/EVALUATION.md`. Live eval **not run**, see below |
 | 13 | Docs: README, ADRs, REPORT_NOTES, THREAT_MODEL, ARCHITECTURE, PROGRESS | done | `docs/` |
 | 14 | Small commits, pushed, authorship audit, lint clean, disk reported | done | see the final summary in the session log; `bun run disk` |
@@ -66,6 +66,57 @@ _Last updated: 2026-11-16 (end of the MVP session)._
    unattended runs until the ask times out (5 min default) and is denied.
 5. `bunfig.toml` `[test] timeout` is ignored by Bun 1.4.4, so long test files call
    `setDefaultTimeout`.
+6. `sage gc` kills a leftover engine process by the pid recorded in its state directory. If the
+   OS has reused that pid for an unrelated process, gc would kill that process.
+   *Proposed fix:* record the process start time with the pid and compare it before killing
+   (`wmic`/`Get-Process` on Windows, `/proc/<pid>/stat` on Linux).
+7. Coverage is measured in-process only. Code that runs in CLI subprocesses (`packages/cli/src`,
+   the crash and robustness tests) is exercised by tests but not counted by `bun test --coverage`.
+8. Concurrent runs in the same repo are safe (tested), but they serialise on SQLite's write lock.
+   Throughput with many parallel runs has not been measured.
+
+## Session 2 (2026-11-16): verification results
+
+No live model calls were made in this session.
+
+- **CI:** green on ubuntu-latest and windows-latest for the latest commits. One earlier red run was
+  caused by a generated JSON file failing the formatter; generated eval output is now excluded
+  from lint.
+- **Fresh clone:** `git clone --recurse-submodules`, then `bun install`, `bun test`, `bun run demo`,
+  the fake-mode `sage run` and `sage trace` from the README, and `sage doctor`. All of them work
+  verbatim on Windows, in both Git Bash and PowerShell. The temporary clone was deleted afterwards.
+- **README fixes:** clone with `--recurse-submodules`; added a `sage doctor` step with an
+  explanation of the expected `WARN` lines; added the tested versions; synced the command
+  reference with `--help`. `packages/cli/test/docs-sync.test.ts` now enforces that sync.
+- **Full suite:** 106 tests, 0 failures. `bun test --coverage` reports **89.43% lines / 89.31%
+  functions** (in-process code only, see known issue 7). Biome is clean, typecheck is clean, the
+  link checker finds 0 broken links, and the fake-mode `sage eval` was regenerated.
+- **Robustness checks** (all are now repeatable tests in `packages/cli/test/`):
+  - Crash and resume at all 7 kill points, repeated 3× (21 runs): all pass.
+  - Two concurrent runs in one repo: **bug found and fixed.** The second process failed with
+    `database is locked`, because a deferred SQLite transaction that upgrades from read to write
+    does not wait on the busy handler. Writes now use `BEGIN IMMEDIATE`, and the busy timeout is set
+    before WAL. The test now checks journal rebuild equality, separate branches and worktrees, and
+    correct content for both runs (passed 4/4 consecutive runs).
+  - `sage gc` after an aborted run: **gap fixed.** gc removed worktrees but not leftover engine
+    processes. The OpenCode adapter now writes an `engine.pid` file per server, and gc kills any
+    that are still alive.
+  - Uncommitted changes in the target repo: untouched, both tracked edits and untracked files.
+    `sage merge` refuses with a clear message instead of overwriting them.
+  - Repo path containing spaces: works end to end, including merge.
+  - Paths longer than 260 characters inside a worktree: created, verified and merged.
+  - `sage abort` during a pending policy "ask": **bug fixed.** The non-interactive approver kept
+    waiting until its 5-minute timeout, and the orchestrator would have attempted invalid
+    transitions on the ABORTED run. Now abort rejects pending approvals, the approver and the guard
+    stop on ABORTED, in-flight engine turns get an abort signal, and the scheduler stops. In the
+    test, the process exits within seconds.
+  - Invalid `sage.config.jsonc`: **improved.** The error used to be a raw Zod dump. It now names the
+    file and every bad key (`retry.maxAttempts: …`), and syntax errors say "is not valid JSONC".
+- **`sage doctor`: 2 bugs fixed.**
+  - The version check compared `v2.0.29` with `2.3.0`, so equal versions would also have been
+    reported as a mismatch.
+  - Sign-in detection looked for a V1 `auth.json`; it now asks `opencode auth list` and prints
+    names only.
 
 ## Suggested next fixes (priority order)
 
