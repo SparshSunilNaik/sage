@@ -1,0 +1,19 @@
+{
+  "name": "sage",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*", "evals"],
+  "scripts": {
+    "sage": "bun run packages/cli/src/bin.ts",
+    "test": "bun test",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "disk": "bun run scripts/disk-usage.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.8",
+    "@types/bun": "latest",
+    "typescript": "^5.9.3"
+  }
+}

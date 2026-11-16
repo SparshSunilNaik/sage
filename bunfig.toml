@@ -1,0 +1,7 @@
+[install.cache]
+# Keep the Bun package cache inside the project (see disk budget in PROGRESS.md).
+dir = "./.cache/bun-install"
+
+[test]
+root = "."
+timeout = 60000

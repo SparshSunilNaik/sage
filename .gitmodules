@@ -1,0 +1,3 @@
+[submodule "opencode"]
+	path = engine/opencode
+	url = https://github.com/SparshSunilNaik/opencode.git
