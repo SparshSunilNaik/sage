@@ -100,8 +100,17 @@ export function abort(j: Journal, runId: string, reason = "aborted by human"): s
   const run = j.mustRun(runId);
   if (run.state === "MERGED" || run.state === "ABORTED")
     throw new OversightError(`run is already ${run.state}`);
+  // Close every open question first, so no approver keeps waiting on a dead run.
+  for (const a of j.approvals(runId).filter((x) => x.status === "pending")) {
+    j.append(runId, a.taskId, "human", {
+      type: "approval.decided",
+      approvalId: a.id,
+      decision: "rejected",
+      reason,
+    });
+  }
   j.transitionRun(runId, "ABORTED", reason, "human");
-  return "run aborted";
+  return "run aborted; run `sage gc` to remove its worktrees";
 }
 
 /** Human-initiated retry of escalated tasks of a FAILED run (separation of duties: never automatic). */

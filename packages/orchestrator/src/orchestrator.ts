@@ -112,6 +112,12 @@ export class Orchestrator {
   private guard: GuardServer | undefined;
   private tracer: Tracer | undefined;
   private mergeChain: Promise<unknown> = Promise.resolve();
+  private cancel = new AbortController();
+
+  /** True once a human aborted (or rejected) the run; all work stops at the next checkpoint. */
+  private isAborted(runId: string): boolean {
+    return this.j.mustRun(runId).state === "ABORTED";
+  }
   private readonly owner = `${hostname()}:${process.pid}:${randomToken(6)}`;
 
   constructor(private readonly o: OrchestratorOptions) {
@@ -164,6 +170,12 @@ export class Orchestrator {
       this.j.acquireLease(runId, this.owner, ttl, got.expiresAt + 1);
     }
     const hb = setInterval(() => this.j.renewLease(runId, this.owner, ttl), Math.max(1000, ttl / 3));
+    // A human may abort from another terminal (`sage abort`): notice it quickly and interrupt
+    // in-flight engine turns instead of finishing work that will be thrown away.
+    this.cancel = new AbortController();
+    const watch = setInterval(() => {
+      if (this.isAborted(runId)) this.cancel.abort();
+    }, 500);
     this.tracer = new Tracer(
       runId,
       this.o.exporter ?? new JsonlExporter(tracePath(this.repo, runId)),
@@ -194,6 +206,7 @@ export class Orchestrator {
       }
     } finally {
       clearInterval(hb);
+      clearInterval(watch);
       this.guard.stop();
       const run = this.j.mustRun(runId);
       this.tracer
@@ -285,6 +298,10 @@ export class Orchestrator {
       }
     });
     span.set("sage.plan.attempt", outcome.attempts);
+    if (this.isAborted(runId)) {
+      span.end("error");
+      return;
+    }
     if (!outcome.ok) {
       span.set("sage.plan.errors", outcome.errors).end("error");
       this.j.transitionRun(runId, "FAILED", `planning failed: ${outcome.errors.slice(0, 3).join("; ")}`);
@@ -368,7 +385,7 @@ export class Orchestrator {
         .getTasks(runId)
         .filter((t) => ["READY", "RUNNING", "VERIFYING", "RETRYING"].includes(t.state) && !active.has(t.id));
       for (const t of runnable) {
-        if (active.size >= limit) break;
+        if (active.size >= limit || this.isAborted(runId)) break;
         const p = this.runTask(runId, t.id)
           .catch((e) => this.log(`task ${t.id} crashed in orchestrator: ${(e as Error).stack ?? e}`))
           .finally(() => active.delete(t.id));
@@ -378,6 +395,7 @@ export class Orchestrator {
       await Promise.race(active.values());
     }
 
+    if (this.isAborted(runId)) return; // a human aborted: leave everything as journaled
     const tasks = this.j.getTasks(runId);
     if (tasks.every((t) => t.state === "PASSED")) {
       if (!this.j.approvals(runId).some((a) => a.kind === "merge")) {
@@ -414,6 +432,7 @@ export class Orchestrator {
     const taskSpan = sid(runId, "task", taskId);
     try {
       for (;;) {
+        if (this.isAborted(runId)) return;
         const t = this.j.mustTask(runId, taskId);
         switch (t.state) {
           case "READY":
@@ -623,6 +642,7 @@ export class Orchestrator {
           {
             onModelCall: (c) => this.onModelCall(runId, t.id, "executor", c, agentSpan),
             timeoutMs: this.cfg.engine.opencode.turnTimeoutMs,
+            signal: this.cancel.signal,
           },
         );
       } finally {
@@ -789,6 +809,8 @@ export class Orchestrator {
   private async onGuard(r: GuardRequestParsed): Promise<GuardResponse> {
     const { runId, taskId } = r;
     const summary = summarizeCall(r.tool, r.args);
+    if (this.isAborted(runId))
+      return { decision: "deny", rule: "run-aborted", reason: "the run was aborted by a human" };
     let decision: { decision: "allow" | "deny" | "ask"; rule: string; reason: string };
     let parent: string;
     if (taskId === "planner") {
@@ -844,7 +866,7 @@ export class Orchestrator {
           reason: actor === "sage" ? "no interactive approver; default deny" : undefined,
         });
       }
-      final = ok ? "allow" : "deny";
+      final = ok && !this.isAborted(runId) ? "allow" : "deny";
     }
     this.j.append(runId, taskId === "planner" ? null : taskId, "sage", {
       type: "policy.decision",

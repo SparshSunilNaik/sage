@@ -53,6 +53,8 @@ export class JournalAsker implements Asker {
     while (Date.now() < deadline) {
       const a = this.journal.getApproval(r.approvalId);
       if (a && a.status !== "pending") return a.status === "approved";
+      // `sage abort` / `sage reject` from another terminal: stop waiting immediately.
+      if (this.journal.getRun(r.runId)?.state === "ABORTED") return false;
       await Bun.sleep(500);
     }
     return false;

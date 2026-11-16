@@ -1,5 +1,5 @@
 import { type ChildProcess, spawn } from "node:child_process";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
@@ -27,6 +27,9 @@ export interface OpencodeEngineOptions {
   /** Private OpenCode DB per task (default true). False uses OpenCode's own store (stored sign-ins). */
   isolateState?: boolean;
 }
+
+/** Name of the pid file written into each engine state directory. */
+export const ENGINE_PID_FILE = "engine.pid";
 
 export const GUARD_PLUGIN_DIR = join(import.meta.dir, "..", "..", "guard-plugin", "opencode");
 
@@ -94,6 +97,8 @@ async function startServer(
     detached: process.platform !== "win32",
     stdio: ["pipe", "pipe", "pipe"],
   });
+  // Record the pid so `sage gc` can clean up if the orchestrator is killed before close().
+  if (child.pid) writeFileSync(join(o.stateDir, ENGINE_PID_FILE), String(child.pid));
   let stderr = "";
   child.stderr?.on("data", (d: Buffer) => {
     stderr = (stderr + d.toString("utf8")).slice(-4000);
@@ -228,7 +233,11 @@ class OpencodeSession implements EngineSession {
     }
     await Bun.sleep(300);
     if (this.child.exitCode === null && this.child.pid) killTree(this.child.pid);
+    if (this.pidFile) rmSync(this.pidFile, { force: true });
   }
+
+  /** Set by the engine: pid file that lets `sage gc` kill this server if SAGE dies first. */
+  pidFile: string | undefined;
 }
 
 export function summarizeMessages(msgs: Message[]): {
@@ -311,7 +320,9 @@ export class OpencodeEngine implements EngineAdapter {
         // which would short-circuit it; ADR 0001). The plugin's execute.before hook is the hard gate.
         permissions: [{ action: "*", resource: "*", effect: "ask" }],
       });
-      return new OpencodeSession(http, child, session.data.id, o.model ?? "opencode/default", this.opts);
+      const s = new OpencodeSession(http, child, session.data.id, o.model ?? "opencode/default", this.opts);
+      s.pidFile = join(o.stateDir, ENGINE_PID_FILE);
+      return s;
     } catch (e) {
       if (child.pid) killTree(child.pid);
       throw e;
