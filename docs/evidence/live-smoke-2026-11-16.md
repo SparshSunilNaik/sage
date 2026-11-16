@@ -1,8 +1,10 @@
 # Live smoke test — 2026-11-16
 
 Command: `SAGE_LIVE=1 bun run scripts/live-smoke.ts --model openai/gpt-6.1-terra --shared-store`
-Engine: opencode 2.0.29 (user-installed binary; adapter also probed against 2.3.0). Provider: OpenAI via OpenCode ChatGPT sign-in (official flow).
-Earlier attempts with openai/gpt-5.5 and openai/gpt-5.3-codex-spark failed at planning with `model_not_found` for ChatGPT accounts (0 tokens) and surfaced a real adapter bug (message `limit` must be <= 200), fixed in the same commit.
+
+Engine: opencode 2.0.29 (the user-installed binary; the adapter was also probed against 2.3.0 with `scripts/engine-probe.ts`). Provider: OpenAI through OpenCode's ChatGPT sign-in (official flow). OpenCode reported a cost of $0.00 for this sign-in type, so the token cap was the binding budget.
+
+Earlier attempts with `openai/gpt-5.5` and `openai/gpt-5.3-codex-spark` failed at planning with `model_not_found` for ChatGPT accounts (0 tokens used). They also surfaced a real adapter bug (the message `limit` must be <= 200), fixed in the same commit.
 
 ```text
 run run-0mwjgjeteaca5fbc1 — goal: Add an exported function multiply(a: number, b: number): number to src/math.ts, and a bun test for it in tests/multiply.test.ts. [AWAITING_MERGE_APPROVAL]
@@ -31,17 +33,6 @@ run run-0mwjgjeteaca5fbc1 — goal: Add an exported function multiply(a: number,
    ├─ verify → PASS 98ms
    │  └─ gate test: pass — 2 pass, 0 fail
    └─ merge add-multiply → 0f0859b31ceb
-    {
-      "id": "add-multiply",
-      "state": "PASSED",
-      "attempts": 1,
-      "failure": null
-    }
-  ],
-    "src/math.ts",
-    "tests/multiply.test.ts"
-  ],
-}
 ```
 
 ```json
