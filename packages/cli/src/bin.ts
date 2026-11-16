@@ -64,15 +64,15 @@ program
   .description("approve a pending plan or merge (or a single policy request with --request)")
   .argument("<run>")
   .option("--request <id>", "approve one pending policy 'ask' request")
-  .option("--reason <text>")
+  .option("--reason <text>", "note recorded with the approval")
   .action((run, o) => cmdApprove(run, { ...g(), ...o }));
 
 program
   .command("reject")
   .description("reject a run (ABORTED) or a single policy request with --request")
   .argument("<run>")
-  .option("--request <id>")
-  .option("--reason <text>")
+  .option("--request <id>", "reject one pending policy 'ask' request instead of the whole run")
+  .option("--reason <text>", "note recorded with the rejection")
   .action((run, o) => cmdReject(run, { ...g(), ...o }));
 
 program
@@ -104,8 +104,8 @@ program
   .command("diff")
   .description("show the run's changes (or one task's with --task)")
   .argument("<run>")
-  .option("--task <id>")
-  .option("--stat")
+  .option("--task <id>", "only this task's changes")
+  .option("--stat", "summary of changed files instead of the full diff")
   .action((run, o) => cmdDiff(run, { ...g(), ...o }));
 
 program
@@ -124,7 +124,7 @@ program
   .description("remove worktrees of finished runs")
   .option("--all", "also include FAILED runs")
   .option("--branches", "also delete task (and unmerged run) branches")
-  .option("--dry-run")
+  .option("--dry-run", "show what would be removed")
   .action((o) => cmdGc({ ...g(), ...o }));
 
 program

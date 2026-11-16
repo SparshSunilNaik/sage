@@ -12,7 +12,8 @@
     "typecheck": "bun node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
     "disk": "bun run scripts/disk-usage.ts",
     "demo": "bun run scripts/demo.ts",
-    "probe": "bun run scripts/engine-probe.ts"
+    "probe": "bun run scripts/engine-probe.ts",
+    "links": "bun run scripts/check-links.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",

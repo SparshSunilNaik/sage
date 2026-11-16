@@ -145,19 +145,19 @@ On PowerShell the commands are identical. Use `;` instead of `&&` if you chain t
 | Command | What it does |
 |---|---|
 | `sage init [--fake <scenario>] [--force]` | Write `sage.config.jsonc` and exclude `.sage/` from git |
-| `sage run "<goal>" [--yes] [-c N]` | Create a run, plan it, ask for plan approval (or take `--yes`), execute, then stop at merge approval |
+| `sage run "<goal>" [--yes] [--concurrency <n>]` | Create a run, plan it, ask for plan approval (or take `--yes`), execute, then stop at merge approval |
 | `sage plan "<goal>"` | Plan only; approve later |
 | `sage status [run] [--json]` | List runs, or show one run's tasks, usage and pending approvals |
-| `sage approve <run> [--request <id>]` | Approve the pending plan or merge, or a single policy "ask" request |
-| `sage reject <run> [--request <id>] [--reason]` | Reject the run (it becomes ABORTED), or reject a single request |
+| `sage approve <run> [--request <id>] [--reason <text>]` | Approve the pending plan or merge, or a single policy "ask" request |
+| `sage reject <run> [--request <id>] [--reason <text>]` | Reject the run (it becomes ABORTED), or reject a single request |
 | `sage resume <run> [--yes] [--retry-escalated]` | Continue from the journal after a crash or an approval, or retry escalated tasks |
-| `sage abort <run>` | Abort a run |
+| `sage abort <run>` | Abort a run: pending approvals are rejected and a running orchestrator stops at its next checkpoint |
 | `sage trace <run> [--json]` | Print the causal trace tree, with totals and approvals |
 | `sage diff <run> [--task <id>] [--stat]` | Show the run's or a task's changes |
 | `sage merge <run>` | Fast-forward your target branch to the approved run branch |
-| `sage doctor` | Check bun, git identity, config, OpenCode version against the fork, provider auth presence (no secrets printed) and disk usage |
-| `sage gc [--all] [--branches] [--dry-run]` | Remove worktrees (and optionally branches) of finished runs |
-| `sage eval [--live] [--out file] [--max-usd N]` | Run the evaluation suites and write `docs/EVALUATION.md` |
+| `sage doctor` | Check Bun, git and your git identity, the config, the OpenCode version against the fork, OpenCode sign-ins and provider keys (names only, never values) and disk usage |
+| `sage gc [--all] [--branches] [--dry-run]` | Remove worktrees of finished runs, kill engine processes they left behind, and optionally delete branches |
+| `sage eval [--live] [--out <file>] [--max-usd <n>]` | Run the evaluation suites and write `docs/EVALUATION.md` |
 
 `<run>` accepts a full id, a unique prefix, or `latest`. `-C <path>` selects the target repo.
 
