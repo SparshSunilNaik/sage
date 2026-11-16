@@ -90,4 +90,5 @@ _Last updated: 2026-11-16 (end of the MVP session)._
   (ADR 0003).
 - OpenCode 2.3.0 is installed project-locally in `.cache/opencode-2.3.0` (gitignored). The user's
   global OpenCode is 2.0.29.
-- Disk use is about 0.8 GB in total (`bun run disk`).
+- Disk use is 1.44 GB in total (`bun run disk`), including about 0.7 GB for `.cache` (the Bun cache plus the OpenCode 2.3.0 binary).
+  Leftover test fixtures in temp were removed at the end of the session.
