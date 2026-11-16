@@ -6,13 +6,16 @@
   "scripts": {
     "sage": "bun run packages/cli/src/bin.ts",
     "test": "bun test",
-    "lint": "biome check .",
-    "format": "biome format --write .",
+    "lint": "bun run scripts/lint.ts",
+    "lint:fix": "bun run scripts/lint.ts --write",
+    
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "disk": "bun run scripts/disk-usage.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
+    "@biomejs/js-api": "6.1.0",
+    "@biomejs/wasm-nodejs": "2.6.8",
     "@types/bun": "latest",
     "typescript": "^5.9.3"
   }

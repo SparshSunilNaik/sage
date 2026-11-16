@@ -6,6 +6,8 @@
       "name": "sage",
       "devDependencies": {
         "@biomejs/biome": "2.6.8",
+        "@biomejs/js-api": "6.1.0",
+        "@biomejs/wasm-nodejs": "2.6.8",
         "@types/bun": "latest",
         "typescript": "^5.9.3",
       },
@@ -89,6 +91,10 @@
     "@biomejs/cli-win32-arm64": ["@biomejs/cli-win32-arm64@2.6.8", "", { "os": "win32", "cpu": "arm64" }, "sha512-ezjCEZzHIWE2pdh83a7zLVcAAcDaERcTcvfA7uWlxqz/1CuDxgtfO19pDg9B6YY4wKYIDvYBw2QCMnqIshSwmw=="],
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@2.6.8", "", { "os": "win32", "cpu": "x64" }, "sha512-cD6HvGczZUiAYsY8s2TxxXj2AHFzEdMomvVJfEjzOjBM45nGqIDfBpbtvwGQzDCN8X2yKKk9u1jnDZisT2nxIg=="],
+
+    "@biomejs/js-api": ["@biomejs/js-api@6.1.0", "", { "peerDependencies": { "@biomejs/wasm-bundler": "^2.6.0", "@biomejs/wasm-nodejs": "^2.6.0", "@biomejs/wasm-web": "^2.6.0" }, "optionalPeers": ["@biomejs/wasm-bundler", "@biomejs/wasm-nodejs", "@biomejs/wasm-web"] }, "sha512-u5njUR64aeH5y3/fXYe11S6jBjfxoiEelp5jM5FlxMorIEEKyW9KiX3iIo1Tg3GUV9tV1mc+oP6IMUYVuv0FZg=="],
+
+    "@biomejs/wasm-nodejs": ["@biomejs/wasm-nodejs@2.6.8", "", {}, "sha512-wb7ox/FIg7Wlb6yFYVG1rLkw0uxQi7P5pfWDAy+jVRABZuuUTznxBkn7U2LF64HvRAQf3F3/xTJ7+DCysvbfsw=="],
 
     "@clack/core": ["@clack/core@1.6.0", "", { "dependencies": { "fast-string-width": "^3.0.2", "fast-wrap-ansi": "^0.2.0", "sisteransi": "^2.0.0" } }, "sha512-4GZynIB2IIe431odxesswvWTCP6orvqd6e2b07b3VFWBQRqUqIHc/EPIZwFoKS692QBp+ooPuXKaJV8g4kXuYA=="],
 

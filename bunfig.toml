@@ -3,5 +3,5 @@
 dir = "./.cache/bun-install"
 
 [test]
-root = "."
 timeout = 60000
+pathIgnorePatterns = ["engine/**", ".cache/**", ".sage/**", "node_modules/**", "evals/.out/**"]
