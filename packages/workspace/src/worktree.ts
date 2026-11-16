@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, rmSync, statSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { git, gitTry, headSha } from "./git.ts";
 
@@ -65,24 +65,29 @@ export async function resetWorktree(path: string, sha: string): Promise<void> {
 
 export function dirSize(path: string): number {
   if (!existsSync(path)) return 0;
+  // Symlinks/junctions (workspace links in node_modules) are NOT followed: they would double count.
   let total = 0;
   const stack = [path];
   while (stack.length) {
-    const p = stack.pop()!;
-    let st: ReturnType<typeof statSync>;
+    const dir = stack.pop()!;
+    let entries: import("node:fs").Dirent[];
     try {
-      st = statSync(p, { throwIfNoEntry: false }) as ReturnType<typeof statSync>;
-      if (!st) continue;
+      entries = readdirSync(dir, { withFileTypes: true });
     } catch {
       continue;
     }
-    if (st.isDirectory()) {
-      try {
-        for (const n of readdirSync(p)) stack.push(join(p, n));
-      } catch {
-        /* unreadable */
+    for (const e of entries) {
+      if (e.isSymbolicLink()) continue;
+      const p = join(dir, e.name);
+      if (e.isDirectory()) stack.push(p);
+      else if (e.isFile()) {
+        try {
+          total += lstatSync(p).size;
+        } catch {
+          /* vanished */
+        }
       }
-    } else total += Number(st.size);
+    }
   }
   return total;
 }

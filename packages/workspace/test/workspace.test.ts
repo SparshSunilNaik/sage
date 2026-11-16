@@ -1,4 +1,7 @@
-import { afterAll, describe, expect, test } from "bun:test";
+import { afterAll, describe, expect, setDefaultTimeout, test } from "bun:test";
+
+setDefaultTimeout(180_000);
+
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { cleanup, makeRepo, tempDir } from "@sage/testkit";

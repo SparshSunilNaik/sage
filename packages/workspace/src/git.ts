@@ -57,7 +57,8 @@ export async function branchExists(cwd: string, branch: string): Promise<boolean
 }
 
 export async function isClean(cwd: string): Promise<boolean> {
-  return (await git(cwd, ["status", "--porcelain"])) === "";
+  // Tracked changes only: untracked files cannot be clobbered by a fast-forward of tracked content.
+  return (await git(cwd, ["status", "--porcelain", "--untracked-files=no"])) === "";
 }
 
 export async function gitIdentity(cwd: string): Promise<{ name: string; email: string }> {
