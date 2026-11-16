@@ -33,7 +33,7 @@ describe("guard server + plugin", () => {
       headers: { authorization: `Bearer ${server.token}` },
       body: "{not json",
     });
-    expect((await raw.json()).decision).toBe("deny");
+    expect(((await raw.json()) as { decision: string }).decision).toBe("deny");
   });
 
   test("fails closed when the orchestrator is unreachable or the token is wrong", async () => {
