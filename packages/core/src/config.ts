@@ -245,15 +245,33 @@ export function stripJsonc(src: string): string {
   return out.replace(/,(\s*[}\]])/g, "$1");
 }
 
-export function parseConfig(text: string): SageConfig {
-  const raw: unknown = JSON.parse(stripJsonc(text));
-  return SageConfig.parse(raw);
+export class ConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ConfigError";
+  }
+}
+
+/** Parse and validate config text. Errors name the file and every offending key path. */
+export function parseConfig(text: string, source = CONFIG_FILE): SageConfig {
+  let raw: unknown;
+  try {
+    raw = JSON.parse(stripJsonc(text));
+  } catch (e) {
+    throw new ConfigError(`${source} is not valid JSONC: ${(e as Error).message}`);
+  }
+  const r = SageConfig.safeParse(raw);
+  if (!r.success) {
+    const issues = r.error.issues.map((i) => `  - ${i.path.join(".") || "(root)"}: ${i.message}`);
+    throw new ConfigError(`${source} is invalid:\n${issues.join("\n")}`);
+  }
+  return r.data;
 }
 
 export function loadConfig(repo: string): SageConfig {
   const p = join(repo, CONFIG_FILE);
   if (!existsSync(p)) return SageConfig.parse({});
-  return parseConfig(readFileSync(p, "utf8"));
+  return parseConfig(readFileSync(p, "utf8"), p);
 }
 
 export const CONFIG_TEMPLATE = `// SAGE configuration. Validated with Zod at load time.
