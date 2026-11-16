@@ -68,6 +68,7 @@
         "@sage/trace": "workspace:*",
         "@sage/verify": "workspace:*",
         "@sage/workspace": "workspace:*",
+        "zod": "4.6.7",
       },
     },
     "packages/planner": {

@@ -38,7 +38,11 @@ function label(s: SpanRecord): string {
 }
 
 /** Render spans as an indented tree (goal → plan → task → model/tool calls → diffs → gates → approvals). */
-export function renderTree(spans: readonly SpanRecord[], rootSpanId: string): string {
+export function renderTree(all: readonly SpanRecord[], rootSpanId: string): string {
+  // Deterministic span ids (task, attempt) may be written again by a resumed process: keep the last.
+  const latest = new Map<string, SpanRecord>();
+  for (const s of all) latest.set(s.spanId, s);
+  const spans = [...latest.values()];
   const children = new Map<string, SpanRecord[]>();
   for (const s of spans) {
     const p = s.parentSpanId ?? "";
