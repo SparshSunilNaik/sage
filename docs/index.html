@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAGE · a control plane for coding agents, built on OpenCode</title>
+  <meta name="description" content="SAGE is a command-line control plane that turns a goal into verified, reviewable commits: it runs OpenCode agents under a crash-safe journal, checks every tool call against a policy, and verifies results with tests the agent cannot grade itself.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f6f4ee" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#13120f" media="(prefers-color-scheme: dark)">
+  <link rel="canonical" href="https://sparshsunilnaik.github.io/sage/">
+  <link rel="icon" href="site/img/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SAGE · a control plane for coding agents, built on OpenCode">
+  <meta property="og:description" content="Plan, run, verify and audit autonomous coding work: crash-safe journal, policy on every tool call, verification the model cannot grade itself, human approval before merge.">
+  <meta property="og:url" content="https://sparshsunilnaik.github.io/sage/">
+  <meta property="og:image" content="https://sparshsunilnaik.github.io/sage/site/img/social.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="SAGE: plan, run, verify and audit coding agents on top of OpenCode.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SAGE · a control plane for coding agents, built on OpenCode">
+  <meta name="twitter:description" content="Crash-safe journal, policy on every tool call, verification the model cannot grade itself, human approval before merge.">
+  <meta name="twitter:image" content="https://sparshsunilnaik.github.io/sage/site/img/social.png">
+  <script>
+    // Apply a remembered theme (or ?theme= for testing) before first paint.
+    (function () {
+      var t = null;
+      try { t = new URLSearchParams(location.search).get("theme") || localStorage.getItem("sage-theme"); } catch (e) {}
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+  <link rel="stylesheet" href="site/css/site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="wordmark" href="#top" aria-label="SAGE, back to top">
+      <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect class="wm-bg" x="1" y="1" width="30" height="30" rx="4"/><path class="wm-fg" d="M8 10.5 L14.5 16 L8 21.5" fill="none" stroke-width="2.6" stroke-linecap="square"/><rect x="16.5" y="19.6" width="8" height="2.6" fill="#e2703f"/></svg>
+      SAGE
+    </a>
+    <nav aria-label="Sections">
+      <ul class="nav-links">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#use">Use cases</a></li>
+        <li><a href="#evidence">Evidence</a></li>
+        <li><a href="#limits">Limitations</a></li>
+      </ul>
+    </nav>
+    <div class="nav-tools">
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch theme">theme</button>
+      <a class="nav-gh" href="https://github.com/SparshSunilNaik/sage">GitHub</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" id="top" aria-labelledby="title">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker">Control plane for coding agents · built on OpenCode</p>
+      <h1 id="title">Give an agent a goal. Get back verified, reviewable commits.</h1>
+      <p class="lede">SAGE is a command-line control plane that runs OpenCode agents under a crash-safe journal, checks every tool call against a policy, and verifies the result with your own tests, which the agent cannot grade or edit.</p>
+      <p>Coding agents work inside one session. Splitting the goal, isolating each change, checking it and recovering from failures are left to you. SAGE does that work, then waits for you to approve before anything touches your branch.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#install">Get started</a>
+        <a class="btn" href="https://github.com/SparshSunilNaik/sage">View on GitHub</a>
+      </div>
+      <p class="facts-inline">TypeScript · Bun · SQLite · no Docker · tested on Windows 11 and Ubuntu</p>
+    </div>
+
+    <figure class="terminal" aria-labelledby="term-cap">
+      <div class="terminal-bar" aria-hidden="true"><span>~/sage (git bash)</span><span>fake engine · no model calls</span></div>
+      <pre tabindex="0" aria-label="Captured terminal session: sage run followed by sage trace"><code><span class="p">$</span> bun run sage -C .cache/demo-repo run "add multiply and subtract to src/math.ts" --yes
+<span class="d">$ bun run packages/cli/src/bin.ts -C .cache/demo-repo run "add multiply and subtract to src/math.ts" --yes</span>
+created run run-0mwjhxq1z2afe830f
+run run-0mwjhxq1z2afe830f: <span class="a">AWAITING_MERGE_APPROVAL</span>
+all tasks passed. review: sage diff run-0mwjhxq1z2afe830f / sage trace run-0mwjhxq1z2afe830f
+next: sage approve run-0mwjhxq1z2afe830f &amp;&amp; sage merge run-0mwjhxq1z2afe830f   (or: sage reject run-0mwjhxq1z2afe830f)
+
+<span class="p">$</span> bun run sage -C .cache/demo-repo trace latest
+<span class="d">$ bun run packages/cli/src/bin.ts -C .cache/demo-repo trace latest</span>
+run run-0mwjhxq1z2afe830f — goal: add multiply and subtract to src/math.ts [<span class="a">AWAITING_MERGE_APPROVAL</span>]
+<span class="d">├─ </span>plan (2 tasks, attempt 1) 37ms
+<span class="d">│  └─ </span>chat fake/scripted-1 in=2500 out=600 $0.0165
+<span class="d">├─ </span>approval plan: approved by human
+<span class="d">├─ </span>task multiply: add multiply() → <span class="g">PASSED</span>
+<span class="d">│  ├─ </span>invoke_agent executor attempt 1 (default) 292ms
+<span class="d">│  │  ├─ </span>chat fake/scripted-1 in=1200 out=300 $0.0081
+<span class="d">│  │  ├─ </span>execute_tool read [allow:read] read src/math.ts
+<span class="d">│  │  ├─ </span>chat fake/scripted-1 in=1200 out=300 $0.0081
+<span class="d">│  │  ├─ </span>execute_tool edit [allow:write] edit src/math.ts
+<span class="d">│  │  ├─ </span>chat fake/scripted-1 in=1200 out=300 $0.0081
+<span class="d">│  │  ├─ </span>execute_tool write [allow:write] write tests/multiply.test.ts
+<span class="d">│  │  ├─ </span>chat fake/scripted-1 in=1200 out=300 $0.0081
+<span class="d">│  │  ├─ </span>execute_tool shell [allow:command-allow] shell `bun test`
+<span class="d">│  │  ├─ </span>chat fake/scripted-1 in=1200 out=300 $0.0081
+<span class="d">│  │  └─ </span>diff ee652ba26358: src/math.ts, tests/multiply.test.ts
+<span class="d">│  ├─ </span>verify → <span class="g">PASS</span> 102ms
+<span class="d">│  │  └─ </span>gate test: <span class="g">pass</span> — 2 pass, 0 fail
+<span class="d">│  └─ </span>merge multiply → c5c895cae416
+<span class="d">└─ </span>task subtract: add subtract() → <span class="g">PASSED</span>
+<span class="d">   ├─ </span>invoke_agent executor attempt 1 (default) 216ms
+<span class="d">   │  ├─ </span>chat fake/scripted-1 in=1200 out=300 $0.0081
+<span class="d">   │  ├─ </span>execute_tool edit [allow:write] edit src/math.ts
+<span class="d">   │  ├─ </span>chat fake/scripted-1 in=1200 out=300 $0.0081
+<span class="d">   │  ├─ </span>execute_tool write [allow:write] write tests/subtract.test.ts
+<span class="d">   │  ├─ </span>chat fake/scripted-1 in=1200 out=300 $0.0081
+<span class="d">   │  └─ </span>diff 651ab21914e5: src/math.ts, tests/subtract.test.ts
+<span class="d">   ├─ </span>verify → <span class="g">PASS</span> 95ms
+<span class="d">   │  └─ </span>gate test: <span class="g">pass</span> — 3 pass, 0 fail
+<span class="d">   └─ </span>merge subtract → 24411adda903
+
+model calls=9 tokens in=12100 out=3000 cost=$0.0813 | tool calls=6 denied=0
+approvals:
+<span class="d">  </span>[plan] approved by human — approve plan with 2 task(s)
+<span class="d">  </span>[merge] pending by - — merge sage/run-0mwjhxq1z2afe830f/run into main</code></pre>
+      <figcaption id="term-cap">Real output, captured from the demo repo with the deterministic fake engine. The tree is the audit trace: the plan, each task, model calls, policy decisions on tool calls, diffs, gates and approvals.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="section" id="problem" aria-labelledby="problem-h">
+  <div class="wrap section-grid">
+    <div class="section-mark">§1<span>The problem</span></div>
+    <div>
+      <h2 id="problem-h">Agents got better at writing code. The work around the code is still manual.</h2>
+      <p>A coding agent can edit, run and debug code inside a session. The lifecycle around that session is still yours to manage. You decide how to split the goal and where each change runs. You check whether the result is actually right, and you clean up when a process dies halfway. Nothing remembers what happened once the session ends. The research behind SAGE points to three gaps in particular.</p>
+      <ol class="evidence-list">
+        <li>
+          <span class="figure-num">19%</span>
+          <p>slower: experienced open-source developers using AI tools took 19% longer on real tasks in a randomised trial, while believing they had been about 20% faster. Time shifted from coding to prompting, waiting and reviewing.
+            <cite><a href="https://arxiv.org/abs/2507.09089">Becker et al. (METR), 2025, arXiv:2507.09089</a></cite></p>
+        </li>
+        <li>
+          <span class="figure-num">tests</span>
+          <p>are gameable: when unit tests were altered to contradict the task, so that any pass implies cheating, frontier models still often "passed". Verification run or graded by the agent itself can't be trusted.
+            <cite><a href="https://arxiv.org/abs/2510.20270">Zhong, Raghunathan &amp; Carlini, <i>ImpossibleBench</i>, ICLR 2026, arXiv:2510.20270</a></cite></p>
+        </li>
+        <li>
+          <span class="figure-num">1 of 3</span>
+          <p>root failure categories of multi-agent LLM systems is task verification and termination. The taxonomy was built from 1,642 annotated traces across 7 frameworks.
+            <cite><a href="https://arxiv.org/abs/2503.13657">Cemri et al., <i>Why Do Multi-Agent LLM Systems Fail?</i>, NeurIPS 2025, arXiv:2503.13657</a></cite></p>
+        </li>
+      </ol>
+      <p>Existing tools each cover part of this: sandboxes in some, hooks and checkpoints in others, event logs elsewhere. SAGE's contribution is putting the missing pieces in one local, model-agnostic tool:</p>
+      <ul>
+        <li>a durable task lifecycle;</li>
+        <li>verification the model cannot grade itself;</li>
+        <li>per-task isolation with a policy on every tool call;</li>
+        <li>an append-only trace;</li>
+        <li>human approval gates and cost budgets.</li>
+      </ul>
+      <p>The full gap analysis is in <a href="https://github.com/SparshSunilNaik/sage/blob/main/research.md">research.md</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how" aria-labelledby="how-h">
+  <div class="wrap section-grid">
+    <div class="section-mark">§2<span>How it works</span></div>
+    <div>
+      <h2 id="how-h">A control plane above OpenCode, not a fork of it.</h2>
+      <p>OpenCode does the agent work: providers, the tool loop, LSP, MCP and sessions. SAGE owns everything around a session. It talks to OpenCode in only two ways: the server's HTTP/SSE API, with one <code>opencode serve</code> process per task attempt, and a small guard plugin that sends every tool call to SAGE for a decision.</p>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 880 560" role="img" aria-labelledby="dg-title dg-desc" xmlns="http://www.w3.org/2000/svg">
+          <title id="dg-title">SAGE architecture</title>
+          <desc id="dg-desc">You drive SAGE from the CLI. Inside SAGE, a planner turns the goal into a task graph, a scheduler starts one OpenCode server per task attempt, a guard endpoint applies the policy to every tool call that the sage-guard plugin forwards from OpenCode, a verifier runs your gates in the task's git worktree, and recovery, budgets, the journal and the trace record everything. Passing task branches merge into a run branch; your branch moves only on sage merge after your approval.</desc>
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="dg-arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+            <marker id="ah-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="dg-arrow-accent" d="M0 0 L10 5 L0 10 z"/></marker>
+          </defs>
+
+          <!-- you -->
+          <rect class="dg-box" x="20" y="44" width="124" height="58" rx="3"/>
+          <text class="dg-label" x="34" y="68">You</text>
+          <text class="dg-note" x="34" y="88">sage CLI</text>
+
+          <!-- SAGE frame -->
+          <rect class="dg-frame" x="170" y="16" width="690" height="262" rx="4"/>
+          <text class="dg-frame-label" x="184" y="36">SAGE control plane · one process per run</text>
+
+          <rect class="dg-box" x="190" y="50" width="150" height="58" rx="3"/>
+          <text class="dg-label" x="204" y="74">Planner</text>
+          <text class="dg-note" x="204" y="94">goal → task graph</text>
+
+          <rect class="dg-box" x="360" y="50" width="150" height="58" rx="3"/>
+          <text class="dg-label" x="374" y="74">Scheduler</text>
+          <text class="dg-note" x="374" y="94">deps · concurrency 2</text>
+
+          <rect class="dg-box" x="530" y="50" width="150" height="58" rx="3"/>
+          <text class="dg-label" x="544" y="74">Verifier</text>
+          <text class="dg-note" x="544" y="94">gates · tamper check</text>
+
+          <rect class="dg-box" x="700" y="50" width="140" height="58" rx="3"/>
+          <text class="dg-label" x="714" y="74">Journal</text>
+          <text class="dg-note" x="714" y="94">append-only SQLite</text>
+
+          <rect class="dg-box-accent" x="190" y="160" width="230" height="74" rx="3"/>
+          <text class="dg-label" x="204" y="184">Guard endpoint → Policy</text>
+          <text class="dg-note" x="204" y="204">path jail · protected paths</text>
+          <text class="dg-note" x="204" y="220">commands · network · secrets</text>
+
+          <rect class="dg-box" x="440" y="160" width="170" height="74" rx="3"/>
+          <text class="dg-label" x="454" y="184">Recovery · Budgets</text>
+          <text class="dg-note" x="454" y="204">retry · feedback</text>
+          <text class="dg-note" x="454" y="220">escalate · hard stop</text>
+
+          <rect class="dg-box" x="630" y="160" width="210" height="74" rx="3"/>
+          <text class="dg-label" x="644" y="184">Trace</text>
+          <text class="dg-note" x="644" y="204">goal → plan → calls</text>
+          <text class="dg-note" x="644" y="220">→ diffs → gates → approvals</text>
+
+          <!-- OpenCode frame -->
+          <rect class="dg-frame" x="170" y="316" width="420" height="176" rx="4"/>
+          <text class="dg-frame-label" x="184" y="336">OpenCode 2.x · per attempt</text>
+
+          <rect class="dg-box-accent" x="190" y="352" width="190" height="74" rx="3"/>
+          <text class="dg-label" x="204" y="376">sage-guard plugin</text>
+          <text class="dg-note" x="204" y="396">execute.before hook</text>
+          <text class="dg-note" x="204" y="412">fails closed</text>
+
+          <rect class="dg-box" x="400" y="352" width="170" height="74" rx="3"/>
+          <text class="dg-label" x="414" y="376">Tool loop</text>
+          <text class="dg-note" x="414" y="396">shell · read · edit</text>
+          <text class="dg-note" x="414" y="412">write · patch · grep</text>
+
+          <text class="dg-note" x="190" y="460">model providers: OpenAI · Anthropic (API key) ·</text>
+          <text class="dg-note" x="190" y="476">GitHub Copilot · any provider OpenCode supports</text>
+
+          <!-- git column -->
+          <rect class="dg-box" x="616" y="330" width="244" height="54" rx="3"/>
+          <text class="dg-label" x="630" y="352">Task worktrees</text>
+          <text class="dg-note" x="630" y="372">one branch per task</text>
+
+          <rect class="dg-box" x="616" y="414" width="244" height="54" rx="3"/>
+          <text class="dg-label" x="630" y="436">Run branch</text>
+          <text class="dg-note" x="630" y="456">passing tasks, dependency order</text>
+
+          <rect class="dg-box-accent" x="616" y="498" width="244" height="54" rx="3"/>
+          <text class="dg-label" x="630" y="520">Your branch</text>
+          <text class="dg-note" x="630" y="540">fast-forward after approval</text>
+
+          <!-- edges (none cross) -->
+          <path class="dg-edge" d="M144 73 H186" marker-end="url(#ah)"/>
+          <text class="dg-edge-label" x="148" y="66">goal</text>
+
+          <path class="dg-edge" d="M340 79 H356" marker-end="url(#ah)"/>
+
+          <path class="dg-edge" d="M430 108 V348" marker-end="url(#ah)"/>
+          <text class="dg-edge-label" x="438" y="300">new session per attempt</text>
+
+          <path class="dg-edge" d="M400 389 H384" marker-end="url(#ah)"/>
+          <text class="dg-edge-label" x="390" y="444" text-anchor="middle">each call</text>
+
+          <path class="dg-edge-accent" d="M285 352 V238" marker-end="url(#ah-a)"/>
+          <text class="dg-edge-label" x="278" y="292" text-anchor="end">POST /v1/guard</text>
+          <text class="dg-edge-label" x="278" y="306" text-anchor="end">allow · deny · ask you</text>
+
+          <path class="dg-edge" d="M570 381 H612" marker-end="url(#ah)"/>
+          <text class="dg-edge-label" x="576" y="372">edits</text>
+
+          <path class="dg-edge" d="M620 108 V326" marker-end="url(#ah)"/>
+          <text class="dg-edge-label" x="628" y="300">runs your gates</text>
+
+          <path class="dg-edge" d="M738 384 V410" marker-end="url(#ah)"/>
+          <text class="dg-edge-label" x="746" y="402">merge on PASS</text>
+
+          <path class="dg-edge-accent" d="M738 468 V494" marker-end="url(#ah-a)"/>
+
+          <path class="dg-edge-accent" d="M82 102 V525 H612" marker-end="url(#ah-a)"/>
+          <text class="dg-edge-label" x="92" y="516">sage approve → sage merge</text>
+        </svg>
+        <figcaption>Figure 1. Everything OpenCode-specific sits behind one adapter package. The journal and trace record every step. Your branch is the only arrow that needs you.</figcaption>
+      </figure>
+
+      <h3 id="lifecycle-h">The run lifecycle</h3>
+      <ol class="lifecycle" aria-labelledby="lifecycle-h">
+        <li><b>plan</b><span>A planner session reads the repo and returns a task graph. Zod checks it; invalid plans are sent back.</span></li>
+        <li class="human"><b>approve</b><span>You approve the plan, or pre-approve it with <code>--yes</code>.</span></li>
+        <li><b>execute</b><span>Each task gets its own worktree, branch and OpenCode process, in dependency order, 2 at a time.</span></li>
+        <li><b>verify</b><span>SAGE runs your test, typecheck and lint gates and checks the diff for edits to protected files.</span></li>
+        <li class="human"><b>approve</b><span>Passing tasks are merged into a run branch. You review it with <code>sage diff</code> and <code>sage trace</code>.</span></li>
+        <li class="human"><b>merge</b><span><code>sage merge</code> fast-forwards your branch. Nothing touches it before this step.</span></li>
+      </ol>
+      <p>Every state change is written to an append-only SQLite journal before its side effect happens. If the process is killed at any point, <code>sage resume</code> continues from the journal and re-runs only a step that was started but not finished.</p>
+
+      <blockquote class="principle">
+        <p>The model never grades its own work. A task passes only when SAGE's own gates are green and no protected file was changed without permission.</p>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features" aria-labelledby="features-h">
+  <div class="wrap section-grid">
+    <div class="section-mark">§3<span>What you get</span></div>
+    <div>
+      <h2 id="features-h">What SAGE gives you, and the gap each one closes.</h2>
+      <dl class="features">
+        <div>
+          <dt>Runs survive crashes and resume where they stopped.</dt>
+          <dd>Run and task state machines sit on an append-only event log, and every transition is journaled before it takes effect. The orchestrator was killed at 7 points in a run, 3 times each; every resume finished without duplicated commits or merges.
+            <span class="gap">G1 session-bound execution · G2 unreliable recovery</span></dd>
+        </div>
+        <div>
+          <dt>Every tool call is checked before it runs.</dt>
+          <dd>The guard plugin sends each call to SAGE's policy:
+            <ul>
+              <li>a path jail around the task's worktree;</li>
+              <li>tests and CI config are read-only;</li>
+              <li>commands go through allow and deny lists;</li>
+              <li>network access is off by default;</li>
+              <li>secret environment variables can't be read.</li>
+            </ul>
+            If SAGE can't be reached, the call is denied.
+            <span class="gap">G4 uncontrolled tool access</span></dd>
+        </div>
+        <div>
+          <dt>Tests the agent can't game.</dt>
+          <dd>SAGE runs your gates itself, with secrets scrubbed from the environment. It also re-checks the committed diff, which catches a test file edited indirectly by a script the agent wrote and ran.
+            <span class="gap">G3 self-graded verification</span></dd>
+        </div>
+        <div>
+          <dt>Nothing reaches your branch without you.</dt>
+          <dd>There are two approval gates: the plan, and the merge. An agent can't approve its own work: <code>sage</code> is on the command denylist, approvals are refused inside agent environments, and the journal sits outside every worktree.
+            <span class="gap">G5 limited oversight</span></dd>
+        </div>
+        <div>
+          <dt>Spend has a hard ceiling.</dt>
+          <dd>Token and USD budgets per task and per run are checked after every model call. Going over interrupts the OpenCode session immediately and escalates the task to you.
+            <span class="gap">G7 cost blindness</span></dd>
+        </div>
+        <div>
+          <dt>A full audit trail, down to the file.</dt>
+          <dd><code>sage trace</code> prints goal → plan → task → model calls with tokens and cost → tool calls with policy decisions → diffs → gates → approvals. Every commit carries <code>Sage-Run</code>, <code>Sage-Task</code> and <code>Sage-Step</code> trailers.
+            <span class="gap">G5 opaque decisions</span></dd>
+        </div>
+        <div>
+          <dt>Failures are classified, not just retried.</dt>
+          <dd>SAGE sorts failures into seven classes. Provider hiccups back off and retry. Red gates retry with the gate output fed back to the agent. Policy violations, conflicts, exhausted budgets and unknown errors each have a defined path, ending with escalation to you.
+            <span class="gap">G2 compounding failure</span></dd>
+        </div>
+        <div>
+          <dt>Works with any model OpenCode supports.</dt>
+          <dd>Providers come from OpenCode, through its own sign-in or an API key, and SAGE never handles credentials itself. Anthropic models are used with an API key only, not a Claude subscription.
+            <span class="gap">G7 vendor lock-in</span></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="install" aria-labelledby="install-h">
+  <div class="wrap section-grid">
+    <div class="section-mark">§4<span>Install</span></div>
+    <div>
+      <h2 id="install-h">Install and try it without a model.</h2>
+      <p>The commands below are exactly the ones checked in a fresh clone on Windows 11. They work unchanged in Git Bash, PowerShell, and macOS or Linux shells. Where a step differs by platform, both forms are shown.</p>
+
+      <table class="prereq">
+        <caption class="visually-hidden">Prerequisites and tested versions</caption>
+        <thead><tr><th scope="col">Requirement</th><th scope="col">Tested with</th><th scope="col">Needed for</th></tr></thead>
+        <tbody>
+          <tr><td>git</td><td class="mono">2.55</td><td>everything</td></tr>
+          <tr><td>Bun ≥ 1.4</td><td class="mono">1.4.4</td><td>everything</td></tr>
+          <tr><td>OpenCode 2.x</td><td class="mono">2.3.0, 2.0.29</td><td>real models only</td></tr>
+        </tbody>
+      </table>
+      <p>No Docker, WSL or virtual machine is needed.</p>
+
+      <p class="sub">Install Bun (skip if <code>bun --version</code> already works)</p>
+      <div class="split">
+        <div>
+          <p class="code-label">Windows (PowerShell)</p>
+          <div class="code" data-copy><pre><code>powershell -c "irm bun.sh/install.ps1 | iex"</code></pre></div>
+        </div>
+        <div>
+          <p class="code-label">macOS / Linux</p>
+          <div class="code" data-copy><pre><code>curl -fsSL https://bun.sh/install | bash</code></pre></div>
+        </div>
+      </div>
+      <p class="code-label">or, anywhere with Node.js</p>
+      <div class="code" data-copy><pre><code>npm i -g bun</code></pre></div>
+
+      <p class="sub">Clone, install, test, demo</p>
+      <ol class="steps">
+        <li>Clone with the OpenCode submodule. <code>sage doctor</code> reads the engine version from it.
+          <div class="code" data-copy><pre><code>git clone --recurse-submodules https://github.com/SparshSunilNaik/sage.git</code></pre></div>
+          <div class="code" data-copy><pre><code>cd sage</code></pre></div>
+        </li>
+        <li>Install dependencies and run the test suite. The tests make no model calls; they use a deterministic fake engine.
+          <div class="code" data-copy><pre><code>bun install</code></pre></div>
+          <div class="code" data-copy><pre><code>bun test</code></pre></div>
+        </li>
+        <li>Check your environment. <code>WARN</code> lines about OpenCode or provider keys are expected until you set up a real model, and they don't block the demo.
+          <div class="code" data-copy><pre><code>bun run sage doctor</code></pre></div>
+        </li>
+        <li>Create a demo repo wired to the fake engine, run a goal and read its trace.
+          <div class="code" data-copy><pre><code>bun run demo</code></pre></div>
+          <div class="code" data-copy><pre><code>bun run sage -C .cache/demo-repo run "add multiply and subtract to src/math.ts" --yes</code></pre></div>
+          <div class="code" data-copy><pre><code>bun run sage -C .cache/demo-repo trace latest</code></pre></div>
+        </li>
+      </ol>
+
+      <p class="sub">Point it at your repo and a real model</p>
+      <ol class="steps">
+        <li>Install OpenCode 2.x, then either sign in through OpenCode or export a provider key.
+          <div class="code" data-copy><pre><code>npm i -g @opencode/cli@2.3.0</code></pre></div>
+          <div class="code" data-copy><pre><code>opencode auth login</code></pre></div>
+          <div class="split">
+            <div>
+              <p class="code-label">or an API key, bash / zsh</p>
+              <div class="code" data-copy><pre><code>export OPENAI_API_KEY="..."</code></pre></div>
+            </div>
+            <div>
+              <p class="code-label">or an API key, PowerShell</p>
+              <div class="code" data-copy><pre><code>$env:OPENAI_API_KEY = "..."</code></pre></div>
+            </div>
+          </div>
+        </li>
+        <li>In your repository, create <code>sage.config.jsonc</code>. Replace <code>path/to/sage</code> with your clone.
+          <div class="code" data-copy><pre><code>bun path/to/sage/packages/cli/src/bin.ts init</code></pre></div>
+        </li>
+        <li>Choose a model and your gates. To use an environment key, list it under <code>passEnv</code>. To use an OpenCode sign-in instead, set <code>"isolateState": false</code>.
+          <div class="code" data-copy><pre><code>{
+  "engine": {
+    "kind": "opencode",
+    "model": "openai/gpt-6.1-terra",
+    "opencode": { "passEnv": ["OPENAI_API_KEY"] }
+  },
+  "gates": [{ "name": "test", "command": ["bun", "test"], "parser": "bun-test" }]
+}</code></pre></div>
+        </li>
+        <li>Check the setup, then run a goal. SAGE stops for your plan approval, and again before merge.
+          <div class="code" data-copy><pre><code>bun path/to/sage/packages/cli/src/bin.ts doctor</code></pre></div>
+          <div class="code" data-copy><pre><code>bun path/to/sage/packages/cli/src/bin.ts run "your goal"</code></pre></div>
+        </li>
+      </ol>
+      <div class="note"><p><strong>Provider terms.</strong> Anthropic models work through an API key only, not a Claude Pro or Max subscription. ChatGPT and GitHub Copilot work only through OpenCode's official sign-in flows. SAGE never stores or reads credential values.</p></div>
+      <p>The full command reference is in the <a href="https://github.com/SparshSunilNaik/sage#command-reference">README</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="use" aria-labelledby="use-h">
+  <div class="wrap section-grid">
+    <div class="section-mark">§5<span>Who it's for</span></div>
+    <div>
+      <h2 id="use-h">Useful when you can say what "done" means in a test.</h2>
+      <div class="two-col">
+        <div>
+          <h3>Good fits today</h3>
+          <ul>
+            <li><strong>A batch of small, well-specified changes in one repo:</strong> new functions with tests, small features, mechanical refactors behind an existing suite. Each runs isolated, gets verified and merges in order, and you approve the whole batch once.</li>
+            <li><strong>Running agents unattended, with guardrails:</strong>
+              <ul>
+                <li>network off;</li>
+                <li>tests read-only;</li>
+                <li>hard budget stops;</li>
+                <li>unknown commands wait for your decision, or are denied.</li>
+              </ul>
+              If the machine sleeps or the process dies, <code>sage resume</code> picks the run up.</li>
+            <li><strong>Teams and courses that need an audit trail:</strong> which model did what, at what cost, which tool calls were allowed or blocked, and which task every changed file came from.</li>
+            <li><strong>Comparing models on your own tasks:</strong> the same goals under different <code>engine.model</code> settings, scored by hidden acceptance tests with <code>sage eval</code>.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Not a good fit yet</h3>
+          <ul>
+            <li><strong>Large, ambiguous changes</strong> that need design judgement. SAGE retries or escalates a failing task; it doesn't re-plan it.</li>
+            <li><strong>Repositories you don't trust.</strong> Isolation is at the process and policy level, not a kernel sandbox (see <a href="#limits">limitations</a>).</li>
+            <li><strong>Projects without automated checks.</strong> The gates are the source of truth, and a run where no tests ran counts as a failure.</li>
+            <li><strong>Fast-moving target branches.</strong> Merge is fast-forward only.</li>
+            <li><strong>Shared or server deployments.</strong> SAGE runs on one machine, and the CLI process is the orchestrator.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="evidence" aria-labelledby="evidence-h">
+  <div class="wrap section-grid">
+    <div class="section-mark">§6<span>Evidence</span></div>
+    <div>
+      <h2 id="evidence-h">Measured, not claimed.</h2>
+      <p class="badge">fake engine · measures SAGE's machinery, not model skill · live results pending</p>
+      <p>All the numbers below come from the repository's test suite and from <code>sage eval</code>, run with the deterministic fake engine. Its agent solutions are scripted. So these results show that planning, isolation, policy, verification, recovery and merging behave as designed. They do not show how well a particular model codes. The full live evaluation has not been run yet.</p>
+      <div class="table-scroll">
+        <table class="results">
+          <caption class="visually-hidden">Measured results</caption>
+          <thead><tr><th scope="col">Check</th><th scope="col">Result</th><th scope="col">What it means</th></tr></thead>
+          <tbody>
+            <tr><td>Automated tests</td><td class="num">106 pass · 0 fail</td><td>On Windows 11 locally, and in CI on windows-latest and ubuntu-latest. Line coverage is 89.4%, counting in-process code only.</td></tr>
+            <tr><td>Crash and resume</td><td class="num">7 / 7</td><td>The orchestrator was killed (SIGKILL / TerminateProcess) at 7 points, and every run resumed to completion. The repeated test passes all 21 runs (7 points × 3). Only a step that was killed mid-way re-ran.</td></tr>
+            <tr><td>Red team</td><td class="num">14 / 14 blocked</td><td>The scripted attacks covered escaping the worktree, reading secret env vars, dumping the environment, curl and web fetches, <code>git push</code>, editing tests, CI or <code>.git</code>, and <code>sage approve</code> from the agent. None of them had any effect.</td></tr>
+            <tr><td>Impossible task</td><td class="num">0 / 1 false passes</td><td>The test contradicted the spec. Direct test edits were blocked by policy (4 attempts), and an indirect edit through a script was caught by the verifier. The task was escalated, never merged.</td></tr>
+            <tr><td>Task suite</td><td class="num">7 / 7</td><td>7 tasks in 3 small TypeScript repos pass hidden acceptance tests that the agent never sees. Every changed file is attributable to a task.</td></tr>
+            <tr><td>Budget hard stop</td><td class="num">≤ 1 call over</td><td>The limit is checked after every model call, so the overrun is at most one call. In the eval, one call took spend from under a $0.005 limit to $0.0081.</td></tr>
+            <tr><td>Live smoke run</td><td class="num">1 / 1</td><td>One single-task run through real OpenCode passed: plan → 10 guarded tool calls → SAGE gate → merge into the run branch.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Sources: <a href="https://github.com/SparshSunilNaik/sage/blob/main/docs/EVALUATION.md">EVALUATION.md</a> (generated by <code>sage eval</code>, with the commit and date), <a href="https://github.com/SparshSunilNaik/sage/blob/main/PROGRESS.md">PROGRESS.md</a> and <a href="https://github.com/SparshSunilNaik/sage/tree/main/docs/evidence">docs/evidence</a>.</p>
+      <p>Not measured: a plain-OpenCode baseline, SWE-bench (its official harness needs Docker, which this project doesn't use), and ImpossibleBench with a real model.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="limits" aria-labelledby="limits-h">
+  <div class="wrap section-grid">
+    <div class="section-mark">§7<span>Limits &amp; safety</span></div>
+    <div>
+      <h2 id="limits-h">What SAGE does not do (yet).</h2>
+      <ul class="limits">
+        <li><strong>Isolation is at the process and policy level, not the kernel.</strong> There are no containers or VMs. If an agent writes a program and runs it with an allowed interpreter, that program runs with your user's privileges. SAGE limits the damage with a scrubbed environment, the verifier's tamper check, the merge gate and the trace, but it can't prevent it.</li>
+        <li><strong>"Network off" applies to tools and commands only.</strong> There is no firewall.</li>
+        <li><strong>Merge is fast-forward only.</strong> If your branch moved during the run, you merge the run branch yourself.</li>
+        <li><strong>No re-planning after a failing task.</strong> Failures are retried, with feedback, or escalated to you.</li>
+        <li><strong>No SWE-bench run</strong>, and the full live evaluation is still pending.</li>
+        <li><strong>One machine, one user.</strong> There is no daemon; <code>sage resume</code> restarts the orchestrator.</li>
+      </ul>
+      <p>Read the <a href="https://github.com/SparshSunilNaik/sage/blob/main/docs/THREAT_MODEL.md">threat model</a> for exactly what is and isn't protected, and <a href="https://github.com/SparshSunilNaik/sage/blob/main/PROGRESS.md">PROGRESS.md</a> for known issues and next steps.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div>
+      <h2>Project</h2>
+      <ul>
+        <li><a href="https://github.com/SparshSunilNaik/sage">github.com/SparshSunilNaik/sage</a></li>
+        <li>License: not chosen yet. Until a LICENSE file is added, the code is all rights reserved by its author.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Docs</h2>
+      <ul>
+        <li><a href="https://github.com/SparshSunilNaik/sage#readme">README</a></li>
+        <li><a href="https://github.com/SparshSunilNaik/sage/blob/main/docs/ARCHITECTURE.md">Architecture</a></li>
+        <li><a href="https://github.com/SparshSunilNaik/sage/blob/main/docs/THREAT_MODEL.md">Threat model</a></li>
+        <li><a href="https://github.com/SparshSunilNaik/sage/blob/main/docs/EVALUATION.md">Evaluation</a></li>
+        <li><a href="https://github.com/SparshSunilNaik/sage/tree/main/docs/adr">Decision records</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Built on</h2>
+      <ul>
+        <li><a href="https://opencode.ai">OpenCode</a>, the open-source coding agent SAGE drives (<a href="https://github.com/anomalyco/opencode">source</a>, MIT license)</li>
+        <li><a href="https://bun.sh">Bun</a>, SQLite, Drizzle, Zod, Commander</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="site/js/site.js" defer></script>
+</body>
+</html>

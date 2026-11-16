@@ -12,6 +12,7 @@ import { dirname, join, relative, resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "..");
 const showExternal = process.argv.includes("--external");
+const SITE = "https://sparshsunilnaik.github.io/sage/";
 
 function walk(dir: string, out: string[]): void {
   for (const n of readdirSync(dir)) {
@@ -63,9 +64,10 @@ function linksOf(file: string): string[] {
     const noCode = text.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "");
     return [...noCode.matchAll(/\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)].map((m) => m[1]!);
   }
-  return [...text.matchAll(/\s(?:href|src|content)="([^"]+)"/g)]
-    .map((m) => m[1]!)
-    .filter((u) => !/^[a-z]+\/[a-z]/.test(u) && !/^(width|initial)/.test(u)); // skip meta content values
+  const refs = [...text.matchAll(/\s(?:href|src)="([^"]+)"/g)].map((m) => m[1]!);
+  // <meta content="..."> only matters when it is a URL (og:image, og:url, ...).
+  const metaUrls = [...text.matchAll(/\scontent="(https?:[^"]+)"/g)].map((m) => m[1]!);
+  return [...refs, ...metaUrls];
 }
 
 const files: string[] = ["README.md", "PROGRESS.md", "research.md"].map((f) => join(root, f));
@@ -78,6 +80,13 @@ for (const file of files) {
   const rel = relative(root, file).replace(/\\/g, "/");
   for (const raw of linksOf(file)) {
     const link = raw.replace(/&amp;/g, "&");
+    // Absolute URLs into the published site (og:image, canonical, 404 home link) must exist locally.
+    if (link.startsWith(SITE)) {
+      checked++;
+      const local = resolve(root, "docs", decodeURIComponent(link.slice(SITE.length).split("#")[0] || "index.html"));
+      if (!existsSync(local)) problems.push(`${rel}: '${link}' -> missing ${relative(root, local)}`);
+      continue;
+    }
     if (/^(https?:|mailto:)/i.test(link)) {
       external.add(link);
       continue;

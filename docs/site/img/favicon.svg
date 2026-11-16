@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="SAGE">
+  <rect x="1" y="1" width="30" height="30" rx="4" fill="#1b1a17"/>
+  <path d="M8 10.5 L14.5 16 L8 21.5" fill="none" stroke="#f6f4ee" stroke-width="2.6" stroke-linecap="square" stroke-linejoin="miter"/>
+  <rect x="16.5" y="19.6" width="8" height="2.6" fill="#e2703f"/>
+</svg>

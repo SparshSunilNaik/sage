@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page not found · SAGE</title>
+  <meta name="description" content="This page does not exist on the SAGE project site.">
+  <meta name="robots" content="noindex">
+  <meta name="color-scheme" content="light dark">
+  <!-- GitHub Pages serves this file for ANY missing path, so it is self-contained:
+       inline styles, inline icon, and an absolute link back to the site. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='4' fill='%231b1a17'/%3E%3Cpath d='M8 10.5 L14.5 16 L8 21.5' fill='none' stroke='%23f6f4ee' stroke-width='2.6'/%3E%3Crect x='16.5' y='19.6' width='8' height='2.6' fill='%23e2703f'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --paper: #f6f4ee; --ink: #1b1a17; --ink-2: #4b473f; --rule: #d8d2c4; --accent: #a63a10;
+      --term-bg: #1c1b18; --term-ink: #e9e5da; --term-dim: #a8a194; --term-prompt: #8fb8de; --focus: #1f5fbf;
+      --font-text: Charter, "Bitstream Charter", "Sitka Text", Cambria, "Iowan Old Style", Georgia, serif;
+      --font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --paper: #13120f; --ink: #ece8de; --ink-2: #c2bcae; --rule: #37332b; --accent: #f08a5c; --term-bg: #0c0b0a; --focus: #8ab4f8; color-scheme: dark; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--paper); color: var(--ink);
+      font-family: var(--font-text); font-size: 1.0625rem; line-height: 1.6; padding: 1.5rem; }
+    main { max-width: 40rem; width: 100%; }
+    .mark { font-family: var(--font-mono); font-size: .85rem; color: var(--accent); letter-spacing: .06em; text-transform: uppercase; margin: 0 0 1rem; }
+    h1 { font-size: clamp(1.8rem, 1.4rem + 2vw, 2.6rem); line-height: 1.2; margin: 0 0 1rem; font-weight: 600; }
+    pre { background: var(--term-bg); color: var(--term-ink); font-family: var(--font-mono); font-size: .8rem; line-height: 1.55;
+      padding: .9rem 1rem; border-radius: 6px; overflow-x: auto; margin: 1.5rem 0; }
+    .p { color: var(--term-prompt); } .d { color: var(--term-dim); }
+    a { color: var(--accent); text-underline-offset: .18em; }
+    a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+    .btn { display: inline-block; font-family: var(--font-mono); font-size: .85rem; padding: .6rem 1rem; border: 1px solid var(--accent);
+      border-radius: 3px; background: var(--accent); color: var(--paper); text-decoration: none; }
+    p { color: var(--ink-2); }
+  </style>
+</head>
+<body>
+<main>
+  <p class="mark">404 · not found</p>
+  <h1>There is no page at this address.</h1>
+  <pre><span class="p">$</span> sage trace this-page
+<span class="d">sage: no run matches 'this-page'</span></pre>
+  <p>The link may be old, or the address mistyped. The whole site is a single page.</p>
+  <p><a class="btn" href="https://sparshsunilnaik.github.io/sage/">Go to the SAGE home page</a></p>
+  <p>Or browse the source and docs on <a href="https://github.com/SparshSunilNaik/sage">GitHub</a>.</p>
+</main>
+</body>
+</html>
